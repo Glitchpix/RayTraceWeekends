@@ -67,6 +67,12 @@ inline Vec3 operator*(double t, const Vec3 &v) {
   return {t * v.e[0], t * v.e[1], t * v.e[2]};
 }
 
+inline Vec3 operator+(double t, const Vec3 &v) {
+  return {t + v.e[0], t + v.e[1], t + v.e[2]};
+}
+
+inline Vec3 operator+(const Vec3 &v, double t) { return t + v; }
+
 inline Vec3 operator*(const Vec3 &v, double t) { return t * v; }
 
 inline Vec3 operator/(const Vec3 &v, double t) { return (1 / t) * v; }
