@@ -1,7 +1,25 @@
 #include "color.hpp"
+#include "hittable_list.hpp"
 #include "ray.hpp"
+#include "sphere.hpp"
 #include "vec3.hpp"
 #include <iostream>
+#include <memory>
+
+Color getColor(const Ray &ray, const Hittable &world) {
+  HitRecord hitInfo;
+  if (world.hit(ray, 0, utils::INFINITE_DOUBLE, hitInfo)) {
+    Vec3 normal = hitInfo.normal;
+    Color normalColor{normal.x(), normal.y(), normal.z()};
+    return utils::scaleToPositiveRange(normalColor);
+  }
+  Vec3 unitDirection = unit_vector(ray.direction());
+  Color white{1, 1, 1};
+  Color blue{0, 0, 1};
+
+  auto interpolant = utils::scaleToPositiveRange(unitDirection.y());
+  return (1.0 - interpolant) * white + interpolant * blue;
+}
 
 int main() {
   constexpr double aspectRatio = 16.0 / 9.0;
@@ -26,6 +44,10 @@ int main() {
   const auto firstPixelLocation =
       viewportUpperLeft + 0.5 * (pixelDeltaX + pixelDeltaY);
 
+  HittableList world{};
+  world.add(std::make_shared<Sphere>(Vec3{0, 0, -1}, 0.5));
+  world.add(std::make_shared<Sphere>(Vec3{0, -100.5, -1}, 100));
+
   std::cout << "P3\n" << imageWidth << ' ' << imageHeight << "\n255\n";
 
   for (int yIndex = 0; yIndex < imageHeight; ++yIndex) {
@@ -37,7 +59,7 @@ int main() {
       auto rayDirection = pixelCenter - cameraCenter;
       Ray r{cameraCenter, rayDirection};
 
-      auto pixelColor = r.getColor();
+      auto pixelColor = getColor(r, world);
       color::write(std::cout, pixelColor);
     }
   }

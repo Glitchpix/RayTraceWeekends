@@ -1,6 +1,7 @@
 #pragma once
 
 #include "color.hpp"
+#include "hittable.hpp"
 #include "utils.hpp"
 #include "vec3.hpp"
 
@@ -22,24 +23,7 @@ public:
     const auto a = dot(mDirection, mDirection);
     const auto b = -2 * dot(mDirection, centerDirection);
     const auto c = dot(centerDirection, centerDirection) - radius * radius;
-    return utils::quadraticRealSolve(a, b, c);
-  }
-
-  Color getColor() {
-    const Vec3 sphereCenter = Vec3{0, 0, -1};
-    const double radius = 0.5;
-    const auto t = hitSphere(sphereCenter, radius);
-    if (t > 0.0) {
-      Vec3 normal = (this->at(t) - sphereCenter) / radius;
-      Color normalColor{normal.x(), normal.y(), normal.z()};
-      return utils::scaleToPositiveRange(normalColor);
-    }
-    Vec3 unitDirection = unit_vector(mDirection);
-    Color white{1, 1, 1};
-    Color blue{0, 0, 1};
-
-    auto interpolant = utils::scaleToPositiveRange(unitDirection.y());
-    return (1.0 - interpolant) * white + interpolant * blue;
+    return utils::quadraticRealSolve(a, b, c).first;
   }
 
 private:
