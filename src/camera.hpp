@@ -2,8 +2,10 @@
 
 #include "color.hpp"
 #include "hittable.hpp"
+#include "material.hpp"
 #include "vec3.hpp"
 #include <iostream>
+
 class Camera {
 public:
   double mAspectRatio = 1.0;
@@ -86,21 +88,20 @@ private:
   static Color calculateRayColor(const Ray& ray, int depth,
                                  const Hittable& world) {
     if (depth <= 0) {
-      return Color{0, 0, 0};
+      return color::Black;
     }
     HitRecord hitInfo;
-    constexpr double absorptionFactor = 0.5;
     if (world.hit(ray, Interval{0.001, utils::INFINITE_DOUBLE}, hitInfo)) {
-      Vec3 direction = hitInfo.normal + randomUnitVector();
-      return absorptionFactor *
-             calculateRayColor(Ray{hitInfo.position, direction}, depth - 1,
-                               world);
+      Ray scattered{};
+      Color attenuation{};
+      if (hitInfo.material->scatter(ray, hitInfo, attenuation, scattered)) {
+        return attenuation * calculateRayColor(scattered, depth - 1, world);
+      }
+      return color::Black;
     }
     Vec3 unitDirection = unitVector(ray.direction());
-    Color white{1, 1, 1};
-    Color blue{0.0, 0.0, 1};
 
     auto interpolant = utils::scaleToPositiveRange(unitDirection.y());
-    return (1.0 - interpolant) * white + interpolant * blue;
+    return (1.0 - interpolant) * color::White + interpolant * color::Blue;
   }
 };

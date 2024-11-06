@@ -47,6 +47,13 @@ public:
     return e[0] * e[0] + e[1] * e[1] + e[2] * e[2];
   }
 
+  [[nodiscard]] bool near_zero() const {
+    // Return true if the vector is close to zero in all dimensions.
+    constexpr auto epsilon = 1e-8;
+    return (std::fabs(e[0]) < epsilon) && (std::fabs(e[1]) < epsilon) &&
+           (std::fabs(e[2]) < epsilon);
+  }
+
   static Vec3 random() {
     return {utils::randomDouble(), utils::randomDouble(),
             utils::randomDouble()};
@@ -115,4 +122,8 @@ inline Vec3 randomOnHemisphere(const Vec3& normal) {
     return onUnitSphere;
   }
   return -onUnitSphere;
+}
+
+inline Vec3 reflect(const Vec3& v, const Vec3& n) {
+  return v - 2 * dot(v, n) * n;
 }

@@ -33,4 +33,10 @@ void write(std::ostream& out, const Color& pixel_color) {
   // Write out the pixel color components.
   out << rbyte << ' ' << gbyte << ' ' << bbyte << '\n';
 }
+
+const static Color Black{0, 0, 0};
+const static Color White{1, 1, 1};
+const static Color Red{1, 0, 0};
+const static Color Green{0, 1, 0};
+const static Color Blue{0, 0, 1};
 } // namespace color
