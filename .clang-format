@@ -1,0 +1,4 @@
+Language: Cpp
+BasedOnStyle: LLVM
+AlignOperands: Align
+PointerAlignment: Left
