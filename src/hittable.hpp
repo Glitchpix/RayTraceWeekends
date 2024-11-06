@@ -1,5 +1,6 @@
 #pragma once
 
+#include "interval.hpp"
 #include "ray.hpp"
 #include "vec3.hpp"
 
@@ -24,6 +25,6 @@ public:
   Hittable &operator=(Hittable &&) = delete;
   virtual ~Hittable() = default;
 
-  virtual bool hit(const Ray &ray, double tMin, double tMax,
+  virtual bool hit(const Ray &ray, Interval rayRange,
                    HitRecord &hitInfo) const = 0;
 };

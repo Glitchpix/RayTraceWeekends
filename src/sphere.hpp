@@ -8,7 +8,7 @@ public:
   Sphere(const Vec3 &center, double radius)
       : mCenter{center}, mRadius{std::fmax(0, radius)} {};
 
-  bool hit(const Ray &ray, double tMin, double tMax,
+  bool hit(const Ray &ray, Interval rayRange,
            HitRecord &hitInfo) const override {
     Vec3 centerDirection = mCenter - ray.origin();
     // Quadratic solve for intersection
@@ -21,9 +21,9 @@ public:
     }
 
     double hitRoot = negRoot;
-    if (negRoot <= tMin || negRoot >= tMax) {
+    if (!rayRange.contains(hitRoot)) {
       hitRoot = posRoot;
-      if (posRoot <= tMin || posRoot >= tMax) {
+      if (!rayRange.contains(hitRoot)) {
         return false;
       }
     }

@@ -8,7 +8,7 @@
 
 Color getColor(const Ray &ray, const Hittable &world) {
   HitRecord hitInfo;
-  if (world.hit(ray, 0, utils::INFINITE_DOUBLE, hitInfo)) {
+  if (world.hit(ray, Interval{0, utils::INFINITE_DOUBLE}, hitInfo)) {
     Vec3 normal = hitInfo.normal;
     Color normalColor{normal.x(), normal.y(), normal.z()};
     return utils::scaleToPositiveRange(normalColor);
