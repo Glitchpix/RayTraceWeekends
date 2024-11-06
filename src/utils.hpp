@@ -3,6 +3,7 @@
 #include <cmath>
 #include <limits>
 #include <numbers>
+#include <random>
 #include <utility>
 
 namespace utils {
@@ -28,6 +29,17 @@ template <typename T> inline T scaleToPositiveRange(T value) {
 }
 template <typename T> inline T scaleToSymmetricRange(T value) {
   return value * 2.0 - 1.0; // Maps from [0,1] to [-1,1]
+}
+
+inline double randomDouble() {
+  static std::uniform_real_distribution<double> distribution(0.0, 1.0);
+  static std::mt19937 generator;
+  return distribution(generator);
+}
+
+inline double randomDouble(double min, double max) {
+  // Returns a random real in [min,max).
+  return min + (max - min) * randomDouble();
 }
 
 } // namespace utils

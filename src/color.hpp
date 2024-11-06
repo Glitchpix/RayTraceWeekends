@@ -1,4 +1,5 @@
 #pragma once
+#include "interval.hpp"
 #include "vec3.hpp"
 
 using Color = Vec3;
@@ -12,9 +13,10 @@ void write(std::ostream &out, const Color &pixel_color) {
   constexpr double maxColorValue = 255.0;
 
   // Translate the [0,1] component values to the byte range [0,255].
-  int rbyte = static_cast<int>(round(maxColorValue * r));
-  int gbyte = static_cast<int>(round(maxColorValue * g));
-  int bbyte = static_cast<int>(round(maxColorValue * b));
+  constexpr Interval intensity{0.0, 0.99999};
+  int rbyte = static_cast<int>(round(maxColorValue * intensity.clamp(r)));
+  int gbyte = static_cast<int>(round(maxColorValue * intensity.clamp(g)));
+  int bbyte = static_cast<int>(round(maxColorValue * intensity.clamp(b)));
 
   // Write out the pixel color components.
   out << rbyte << ' ' << gbyte << ' ' << bbyte << '\n';

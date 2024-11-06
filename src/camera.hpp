@@ -7,8 +7,9 @@ class Camera {
 public:
   double mAspectRatio = 1.0;
   double mImageWidth = 100;
+  double mSamplesPerPixel = 10;
 
-  void render(const Hittable &world) {
+  void render(const Hittable& world) {
     initialize();
     std::cout << "P3\n" << mImageWidth << ' ' << mImageHeight << "\n255\n";
 
@@ -16,12 +17,12 @@ public:
       std::clog << "\rScanlines remaining: " << (mImageHeight - yIndex) << ' '
                 << std::flush;
       for (int xIndex = 0; xIndex < mImageWidth; ++xIndex) {
-        auto pixelCenter = mFirstPixelLocation + (yIndex * mPixelDeltaY) +
-                           (xIndex * mPixelDeltaX);
-        auto rayDirection = pixelCenter - mCenter;
-        Ray r{mCenter, rayDirection};
-
-        auto pixelColor = calculateRayColor(r, world);
+        auto pixelColor = Color{0, 0, 0};
+        for (int iSample = 0; iSample < mSamplesPerPixel; ++iSample) {
+          Ray r = calculateSampleRay(xIndex, yIndex);
+          pixelColor += calculateRayColor(r, world);
+        }
+        pixelColor *= pixelSampleScale;
         color::write(std::cout, pixelColor);
       }
     }
@@ -31,6 +32,7 @@ public:
 
 private:
   int mImageHeight;
+  double pixelSampleScale;
   Vec3 mCenter;
   Vec3 mPixelDeltaX;
   Vec3 mPixelDeltaY;
@@ -39,6 +41,7 @@ private:
   void initialize() {
     mImageHeight = std::max(int(mImageWidth / mAspectRatio), 1);
 
+    pixelSampleScale = 1.0 / mSamplesPerPixel;
     constexpr double focalLength = 1.0;
     constexpr double viewportHeight = 2.0;
     const double viewportWidth =
@@ -58,7 +61,27 @@ private:
         viewportUpperLeft + 0.5 * (mPixelDeltaX + mPixelDeltaY);
   };
 
-  Color calculateRayColor(const Ray &ray, const Hittable &world) {
+  [[nodiscard]] Ray calculateSampleRay(int xIndex, int yIndex) const {
+
+    const Vec3 offset = samplePixelCenterOffset();
+    const Vec3 centerDelta = ((yIndex + offset.y()) * mPixelDeltaY) +
+                             ((xIndex + offset.x()) * mPixelDeltaX);
+    const Vec3 pixelCenter = mFirstPixelLocation + centerDelta;
+
+    const Vec3 rayOrigin = mCenter;
+    const Vec3 rayDirection = pixelCenter - rayOrigin;
+    Ray r{rayOrigin, rayDirection};
+
+    return r;
+  }
+
+  [[nodiscard]] Vec3 samplePixelCenterOffset() const {
+    // Returns the vector to a random point in the [-.5,-.5]-[+.5,+.5] unit
+    // square.
+    return {utils::randomDouble() - 0.5, utils::randomDouble() - 0.5, 0};
+  }
+
+  Color calculateRayColor(const Ray& ray, const Hittable& world) {
     HitRecord hitInfo;
     if (world.hit(ray, Interval{0, utils::INFINITE_DOUBLE}, hitInfo)) {
       Vec3 normal = hitInfo.normal;

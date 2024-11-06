@@ -4,9 +4,10 @@
 
 class Interval {
 public:
-  Interval() : mMin{+utils::INFINITE_DOUBLE}, mMax{-utils::INFINITE_DOUBLE} {};
+  constexpr Interval()
+      : mMin{+utils::INFINITE_DOUBLE}, mMax{-utils::INFINITE_DOUBLE} {};
 
-  Interval(double min, double max) : mMin{min}, mMax{max} {};
+  constexpr Interval(double min, double max) : mMin{min}, mMax{max} {};
 
   [[nodiscard]] double min() const { return mMin; }
   [[nodiscard]] double max() const { return mMax; }
@@ -16,6 +17,10 @@ public:
   [[nodiscard]] bool contains(double x) const { return mMin <= x && x <= mMax; }
 
   [[nodiscard]] bool surrounds(double x) const { return mMin < x && x < mMax; }
+
+  [[nodiscard]] constexpr double clamp(double x) const {
+    return std::clamp(x, mMin, mMax);
+  }
 
   static const Interval empty, universe;
 

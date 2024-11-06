@@ -11,10 +11,12 @@ int main() {
 
   constexpr double aspectRatio = 16.0 / 9.0;
   constexpr int imageWidth = 500;
+  constexpr int samplesPerPixel = 100;
 
   Camera cam;
   cam.mAspectRatio = aspectRatio;
   cam.mImageWidth = imageWidth;
+  cam.mSamplesPerPixel = samplesPerPixel;
 
   cam.render(world);
 }
