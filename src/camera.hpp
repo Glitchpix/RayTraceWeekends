@@ -2,12 +2,14 @@
 
 #include "color.hpp"
 #include "hittable.hpp"
+#include "vec3.hpp"
 #include <iostream>
 class Camera {
 public:
   double mAspectRatio = 1.0;
   double mImageWidth = 100;
   double mSamplesPerPixel = 10;
+  int mMaxDepth = 10;
 
   void render(const Hittable& world) {
     initialize();
@@ -20,7 +22,7 @@ public:
         auto pixelColor = Color{0, 0, 0};
         for (int iSample = 0; iSample < mSamplesPerPixel; ++iSample) {
           Ray r = calculateSampleRay(xIndex, yIndex);
-          pixelColor += calculateRayColor(r, world);
+          pixelColor += calculateRayColor(r, mMaxDepth, world);
         }
         pixelColor *= pixelSampleScale;
         color::write(std::cout, pixelColor);
@@ -31,8 +33,8 @@ public:
   }
 
 private:
-  int mImageHeight;
-  double pixelSampleScale;
+  int mImageHeight{};
+  double pixelSampleScale{};
   Vec3 mCenter;
   Vec3 mPixelDeltaX;
   Vec3 mPixelDeltaY;
@@ -75,22 +77,28 @@ private:
     return r;
   }
 
-  [[nodiscard]] Vec3 samplePixelCenterOffset() const {
+  [[nodiscard]] static Vec3 samplePixelCenterOffset() {
     // Returns the vector to a random point in the [-.5,-.5]-[+.5,+.5] unit
     // square.
     return {utils::randomDouble() - 0.5, utils::randomDouble() - 0.5, 0};
   }
 
-  Color calculateRayColor(const Ray& ray, const Hittable& world) {
-    HitRecord hitInfo;
-    if (world.hit(ray, Interval{0, utils::INFINITE_DOUBLE}, hitInfo)) {
-      Vec3 normal = hitInfo.normal;
-      Color normalColor{normal.x(), normal.y(), normal.z()};
-      return utils::scaleToPositiveRange(normalColor);
+  static Color calculateRayColor(const Ray& ray, int depth,
+                                 const Hittable& world) {
+    if (depth <= 0) {
+      return Color{0, 0, 0};
     }
-    Vec3 unitDirection = unit_vector(ray.direction());
+    HitRecord hitInfo;
+    constexpr double absorptionFactor = 0.5;
+    if (world.hit(ray, Interval{0.001, utils::INFINITE_DOUBLE}, hitInfo)) {
+      Vec3 direction = hitInfo.normal + randomUnitVector();
+      return absorptionFactor *
+             calculateRayColor(Ray{hitInfo.position, direction}, depth - 1,
+                               world);
+    }
+    Vec3 unitDirection = unitVector(ray.direction());
     Color white{1, 1, 1};
-    Color blue{0, 0, 1};
+    Color blue{0.0, 0.0, 1};
 
     auto interpolant = utils::scaleToPositiveRange(unitDirection.y());
     return (1.0 - interpolant) * white + interpolant * blue;

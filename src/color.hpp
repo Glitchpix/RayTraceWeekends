@@ -5,10 +5,22 @@
 using Color = Vec3;
 
 namespace color {
-void write(std::ostream &out, const Color &pixel_color) {
+
+inline double linearToGamma(double linearComponent) {
+  if (linearComponent > 0) {
+    return std::sqrt(linearComponent);
+  }
+
+  return 0;
+}
+void write(std::ostream& out, const Color& pixel_color) {
   auto r = pixel_color.x();
   auto g = pixel_color.y();
   auto b = pixel_color.z();
+
+  r = linearToGamma(r);
+  g = linearToGamma(g);
+  b = linearToGamma(b);
 
   constexpr double maxColorValue = 255.0;
 

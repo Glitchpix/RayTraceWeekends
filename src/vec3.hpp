@@ -1,4 +1,5 @@
 #pragma once
+#include "utils.hpp"
 #include <array>
 #include <ostream>
 
@@ -45,6 +46,16 @@ public:
   [[nodiscard]] double length_squared() const {
     return e[0] * e[0] + e[1] * e[1] + e[2] * e[2];
   }
+
+  static Vec3 random() {
+    return {utils::randomDouble(), utils::randomDouble(),
+            utils::randomDouble()};
+  }
+
+  static Vec3 random(double min, double max) {
+    return {utils::randomDouble(min, max), utils::randomDouble(min, max),
+            utils::randomDouble(min, max)};
+  }
 };
 
 inline std::ostream& operator<<(std::ostream& out, const Vec3& v) {
@@ -86,4 +97,22 @@ inline Vec3 cross(const Vec3& u, const Vec3& v) {
           u.e[0] * v.e[1] - u.e[1] * v.e[0]};
 }
 
-inline Vec3 unit_vector(const Vec3& v) { return v / v.length(); }
+inline Vec3 unitVector(const Vec3& v) { return v / v.length(); }
+
+inline Vec3 randomUnitVector() {
+  while (true) {
+    auto p = Vec3::random(-1, 1);
+    auto lensq = p.length_squared();
+    if (1e-160 < lensq && lensq <= 1) {
+      return p / sqrt(lensq);
+    }
+  }
+}
+
+inline Vec3 randomOnHemisphere(const Vec3& normal) {
+  Vec3 onUnitSphere = randomUnitVector();
+  if (dot(onUnitSphere, normal) > 0) {
+    return onUnitSphere;
+  }
+  return -onUnitSphere;
+}
