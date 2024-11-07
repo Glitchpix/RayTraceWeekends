@@ -10,7 +10,7 @@ int main() {
 
   auto materialGround = std::make_shared<Lambertian>(Color(0.8, 0.8, 0.0));
   auto materialCenter = std::make_shared<Lambertian>(Color(0.1, 0.2, 0.5));
-  auto materialLeft = std::make_shared<Dielectric>(1.5);
+  auto materialLeft = std::make_shared<Dielectric>(1.0 / 1.333);
   auto materialRight = std::make_shared<Metal>(Color(0.8, 0.6, 0.2), 1.0);
 
   world.add(
@@ -22,8 +22,8 @@ int main() {
 
   constexpr double aspectRatio = 16.0 / 9.0;
   constexpr int imageWidth = 400;
-  constexpr int samplesPerPixel = 20;
-  constexpr int maxDepth = 30;
+  constexpr int samplesPerPixel = 10;
+  constexpr int maxDepth = 20;
 
   Camera cam;
   cam.mAspectRatio = aspectRatio;

@@ -3,6 +3,7 @@
 #include "color.hpp"
 #include "hittable.hpp"
 #include "vec3.hpp"
+#include <cmath>
 class IMaterial {
 public:
   IMaterial() = default;
@@ -65,12 +66,25 @@ public:
   bool scatter(const Ray& incoming, const HitRecord& hitInfo,
                Color& attenuation, Ray& scattered) const override {
     attenuation = color::White;
-    double ri = hitInfo.frontFace ? (1.0 / mRefractionIndex) : mRefractionIndex;
+    double refractIndex =
+        hitInfo.frontFace ? (1.0 / mRefractionIndex) : mRefractionIndex;
 
-    Vec3 incomingDirection = unitVector(incoming.direction());
-    Vec3 refracted = refract(incomingDirection, hitInfo.normal, ri);
+    Vec3 incomingUnitDirection = unitVector(incoming.direction());
 
-    scattered = Ray{hitInfo.position, refracted};
+    double cosTheta =
+        std::fmin(dot(-incomingUnitDirection, hitInfo.normal), 1.0);
+    double sinTheta = std::sqrt(1.0 - cosTheta * cosTheta);
+
+    bool totalInternalReflection = refractIndex * sinTheta > 1.0;
+    Vec3 newDirection{};
+    if (totalInternalReflection) {
+      newDirection = reflect(incomingUnitDirection, hitInfo.normal);
+    } else {
+      newDirection =
+          refract(incomingUnitDirection, hitInfo.normal, refractIndex);
+    }
+
+    scattered = Ray{hitInfo.position, newDirection};
     return true;
   }
 
