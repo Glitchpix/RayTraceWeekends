@@ -11,26 +11,31 @@ public:
 
   bool hit(const Ray& ray, Interval rayRange,
            HitRecord& hitInfo) const override {
-    Vec3 centerDirection = mCenter - ray.origin();
-    // Quadratic solve for intersection
-    const auto a = dot(ray.direction(), ray.direction());
-    const auto b = -2 * dot(ray.direction(), centerDirection);
-    const auto c = dot(centerDirection, centerDirection) - mRadius * mRadius;
-    const auto [negRoot, posRoot] = utils::quadraticRealSolve(a, b, c);
-    if (negRoot < 0) {
+
+    // TODO: Find out why normal method produced weird visual bug?
+    Vec3 oc = mCenter - ray.origin();
+    auto a = ray.direction().length_squared();
+    auto h = dot(ray.direction(), oc);
+    auto c = oc.length_squared() - mRadius * mRadius;
+
+    auto discriminant = h * h - a * c;
+    if (discriminant < 0) {
       return false;
     }
 
-    double hitRoot = negRoot;
-    if (!rayRange.contains(hitRoot)) {
-      hitRoot = posRoot;
-      if (!rayRange.contains(hitRoot)) {
+    auto sqrtd = std::sqrt(discriminant);
+
+    // Find the nearest root that lies in the acceptable range.
+    auto root = (h - sqrtd) / a;
+    if (!rayRange.surrounds(root)) {
+      root = (h + sqrtd) / a;
+      if (!rayRange.surrounds(root)) {
         return false;
       }
     }
 
-    hitInfo.t = hitRoot;
-    hitInfo.position = ray.at(hitRoot);
+    hitInfo.t = root;
+    hitInfo.position = ray.at(root);
     hitInfo.material = mMaterial;
     Vec3 normal = (hitInfo.position - mCenter) / mRadius;
     hitInfo.setFaceNormal(ray, normal);

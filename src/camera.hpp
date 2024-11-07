@@ -9,8 +9,8 @@
 class Camera {
 public:
   double mAspectRatio = 1.0;
-  double mImageWidth = 100;
-  double mSamplesPerPixel = 10;
+  int mImageWidth = 100;
+  int mSamplesPerPixel = 10;
   int mMaxDepth = 10;
 
   void render(const Hittable& world) {
@@ -102,6 +102,7 @@ private:
     Vec3 unitDirection = unitVector(ray.direction());
 
     auto interpolant = utils::scaleToPositiveRange(unitDirection.y());
-    return (1.0 - interpolant) * color::White + interpolant * color::Blue;
+    return (1.0 - interpolant) * color::White +
+           interpolant * Color(0.5, 0.7, 1.0);
   }
 };

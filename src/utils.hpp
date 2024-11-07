@@ -25,7 +25,7 @@ inline std::pair<double, double> quadraticRealSolve(double a, double b,
 }
 
 template <typename T> inline T scaleToPositiveRange(T value) {
-  return (value + 1.0) / 2.0; // Maps from [-1,1] to [0,1]
+  return 0.5 * (value + 1.0); // Maps from [-1,1] to [0,1]
 }
 template <typename T> inline T scaleToSymmetricRange(T value) {
   return value * 2.0 - 1.0; // Maps from [0,1] to [-1,1]

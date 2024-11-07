@@ -22,13 +22,13 @@ void write(std::ostream& out, const Color& pixel_color) {
   g = linearToGamma(g);
   b = linearToGamma(b);
 
-  constexpr double maxColorValue = 255.0;
+  constexpr int maxColorValue = 256;
 
   // Translate the [0,1] component values to the byte range [0,255].
   constexpr Interval intensity{0.0, 0.99999};
-  int rbyte = static_cast<int>(round(maxColorValue * intensity.clamp(r)));
-  int gbyte = static_cast<int>(round(maxColorValue * intensity.clamp(g)));
-  int bbyte = static_cast<int>(round(maxColorValue * intensity.clamp(b)));
+  int rbyte = int(maxColorValue * intensity.clamp(r));
+  int gbyte = int(maxColorValue * intensity.clamp(g));
+  int bbyte = int(maxColorValue * intensity.clamp(b));
 
   // Write out the pixel color components.
   out << rbyte << ' ' << gbyte << ' ' << bbyte << '\n';

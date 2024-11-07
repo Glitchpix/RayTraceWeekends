@@ -14,7 +14,7 @@ struct HitRecord {
   double t{};
   bool frontFace{};
 
-  void setFaceNormal(const Ray ray, const Vec3& outwardNormal) {
+  void setFaceNormal(const Ray& ray, const Vec3& outwardNormal) {
     frontFace = dot(ray.direction(), outwardNormal) < 0;
     normal = frontFace ? outwardNormal : -outwardNormal;
   }
