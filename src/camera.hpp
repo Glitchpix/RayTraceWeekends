@@ -3,7 +3,9 @@
 #include "color.hpp"
 #include "hittable.hpp"
 #include "material.hpp"
+#include "utils.hpp"
 #include "vec3.hpp"
+#include <cmath>
 #include <iostream>
 
 class Camera {
@@ -12,6 +14,9 @@ public:
   int mImageWidth = 100;
   int mSamplesPerPixel = 10;
   int mMaxDepth = 10;
+
+  double mVerticalFov = 90;
+  double mFocalLength = 1.0;
 
   void render(const Hittable& world) {
     initialize();
@@ -46,8 +51,11 @@ private:
     mImageHeight = std::max(int(mImageWidth / mAspectRatio), 1);
 
     pixelSampleScale = 1.0 / mSamplesPerPixel;
-    constexpr double focalLength = 1.0;
-    constexpr double viewportHeight = 2.0;
+
+    const double theta = utils::toRadians(mVerticalFov);
+    const double h = std::tan(theta / 2.0);
+    const double viewportHeight = 2.0 * h * mFocalLength;
+    ;
     const double viewportWidth =
         viewportHeight * (double(mImageWidth) / mImageHeight);
     mCenter = Vec3{0, 0, 0};
@@ -58,7 +66,7 @@ private:
     mPixelDeltaX = viewportXDirection / mImageWidth;
     mPixelDeltaY = viewportYDirection / mImageHeight;
 
-    const auto viewportUpperLeft = mCenter - Vec3{0, 0, focalLength} -
+    const auto viewportUpperLeft = mCenter - Vec3{0, 0, mFocalLength} -
                                    viewportXDirection / 2 -
                                    viewportYDirection / 2;
     mFirstPixelLocation =
