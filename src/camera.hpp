@@ -20,6 +20,9 @@ public:
   Vec3 mLookAt{0, 0, -1};
   Vec3 mUp{0, 1, 0};
 
+  double mDefocusAngle = 0;
+  double mFocusDistance = 10;
+
   void render(const Hittable& world) {
     initialize();
     std::cout << "P3\n" << mImageWidth << ' ' << mImageHeight << "\n255\n";
@@ -50,6 +53,9 @@ private:
   Vec3 mFirstPixelLocation;
   Vec3 mU, mV, mW;
 
+  Vec3 mDefocusDiskU;
+  Vec3 mDefocusDiskV;
+
   void initialize() {
     mImageHeight = std::max(int(mImageWidth / mAspectRatio), 1);
 
@@ -57,10 +63,9 @@ private:
 
     mCenter = mLookFrom;
 
-    const double focalLength = (mLookFrom - mLookAt).length();
     const double theta = utils::toRadians(mVerticalFov);
     const double h = std::tan(theta / 2.0);
-    const double viewportHeight = 2.0 * h * focalLength;
+    const double viewportHeight = 2.0 * h * mFocusDistance;
     const double viewportWidth =
         viewportHeight * (double(mImageWidth) / mImageHeight);
 
@@ -74,11 +79,17 @@ private:
     mPixelDeltaX = viewportXDirection / mImageWidth;
     mPixelDeltaY = viewportYDirection / mImageHeight;
 
-    const auto viewportUpperLeft = mCenter - (focalLength * mW) -
+    const auto viewportUpperLeft = mCenter - (mFocusDistance * mW) -
                                    viewportXDirection / 2 -
                                    viewportYDirection / 2;
     mFirstPixelLocation =
         viewportUpperLeft + 0.5 * (mPixelDeltaX + mPixelDeltaY);
+
+    const auto defocusRadius =
+        mFocusDistance * std::tan(utils::toRadians(mDefocusAngle / 2.0));
+
+    mDefocusDiskU = mU * defocusRadius;
+    mDefocusDiskV = mV * defocusRadius;
   };
 
   [[nodiscard]] Ray calculateSampleRay(int xIndex, int yIndex) const {
@@ -88,11 +99,16 @@ private:
                              ((xIndex + offset.x()) * mPixelDeltaX);
     const Vec3 pixelCenter = mFirstPixelLocation + centerDelta;
 
-    const Vec3 rayOrigin = mCenter;
+    const Vec3 rayOrigin = (mDefocusAngle <= 0) ? mCenter : defocusDiskSample();
     const Vec3 rayDirection = pixelCenter - rayOrigin;
     Ray r{rayOrigin, rayDirection};
 
     return r;
+  }
+
+  [[nodiscard]] Vec3 defocusDiskSample() const {
+    const Vec3 point = randomInUnitDisk();
+    return mCenter + (point.x() * mDefocusDiskU) + (point.y() * mDefocusDiskV);
   }
 
   [[nodiscard]] static Vec3 samplePixelCenterOffset() {
