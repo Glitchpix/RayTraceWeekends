@@ -16,7 +16,9 @@ public:
   int mMaxDepth = 10;
 
   double mVerticalFov = 90;
-  double mFocalLength = 1.0;
+  Vec3 mLookFrom{0, 0, 0};
+  Vec3 mLookAt{0, 0, -1};
+  Vec3 mUp{0, 1, 0};
 
   void render(const Hittable& world) {
     initialize();
@@ -31,7 +33,7 @@ public:
           Ray r = calculateSampleRay(xIndex, yIndex);
           pixelColor += calculateRayColor(r, mMaxDepth, world);
         }
-        pixelColor *= pixelSampleScale;
+        pixelColor *= mPixelSampleScale;
         color::write(std::cout, pixelColor);
       }
     }
@@ -41,32 +43,38 @@ public:
 
 private:
   int mImageHeight{};
-  double pixelSampleScale{};
+  double mPixelSampleScale{};
   Vec3 mCenter;
   Vec3 mPixelDeltaX;
   Vec3 mPixelDeltaY;
   Vec3 mFirstPixelLocation;
+  Vec3 mU, mV, mW;
 
   void initialize() {
     mImageHeight = std::max(int(mImageWidth / mAspectRatio), 1);
 
-    pixelSampleScale = 1.0 / mSamplesPerPixel;
+    mPixelSampleScale = 1.0 / mSamplesPerPixel;
 
+    mCenter = mLookFrom;
+
+    const double focalLength = (mLookFrom - mLookAt).length();
     const double theta = utils::toRadians(mVerticalFov);
     const double h = std::tan(theta / 2.0);
-    const double viewportHeight = 2.0 * h * mFocalLength;
-    ;
+    const double viewportHeight = 2.0 * h * focalLength;
     const double viewportWidth =
         viewportHeight * (double(mImageWidth) / mImageHeight);
-    mCenter = Vec3{0, 0, 0};
 
-    const Vec3 viewportXDirection = Vec3{viewportWidth, 0, 0};
-    const Vec3 viewportYDirection = Vec3{0, -viewportHeight, 0};
+    mW = unitVector(mLookFrom - mLookAt);
+    mU = unitVector(cross(mUp, mW));
+    mV = cross(mW, mU);
+
+    const Vec3 viewportXDirection = viewportWidth * mU;
+    const Vec3 viewportYDirection = viewportHeight * -mV; // Flipped y-axis
 
     mPixelDeltaX = viewportXDirection / mImageWidth;
     mPixelDeltaY = viewportYDirection / mImageHeight;
 
-    const auto viewportUpperLeft = mCenter - Vec3{0, 0, mFocalLength} -
+    const auto viewportUpperLeft = mCenter - (focalLength * mW) -
                                    viewportXDirection / 2 -
                                    viewportYDirection / 2;
     mFirstPixelLocation =
