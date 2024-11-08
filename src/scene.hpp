@@ -70,7 +70,9 @@ void oneWeekendFinalScene(HittableList& world, Camera& cam) {
           // diffuse
           auto albedo = Color::random() * Color::random();
           sphere_material = make_shared<Lambertian>(albedo);
-          world.add(make_shared<Sphere>(center, 0.2, sphere_material));
+          auto endCenter = center + Vec3{0, utils::randomDouble(0, 0.5), 0};
+          world.add(
+              make_shared<Sphere>(center, endCenter, 0.2, sphere_material));
         } else if (choose_mat < 0.95) {
           // metal
           auto albedo = Color::random(0.5, 1);
@@ -96,8 +98,8 @@ void oneWeekendFinalScene(HittableList& world, Camera& cam) {
   world.add(make_shared<Sphere>(Vec3(4, 1, 0), 1.0, material3));
 
   cam.mAspectRatio = 16.0 / 9.0;
-  cam.mImageWidth = 1200;
-  cam.mSamplesPerPixel = 500;
+  cam.mImageWidth = 400;
+  cam.mSamplesPerPixel = 50;
   cam.mMaxDepth = 50;
 
   cam.mVerticalFov = 20;

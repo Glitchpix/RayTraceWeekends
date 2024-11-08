@@ -101,9 +101,9 @@ private:
 
     const Vec3 rayOrigin = (mDefocusAngle <= 0) ? mCenter : defocusDiskSample();
     const Vec3 rayDirection = pixelCenter - rayOrigin;
-    Ray r{rayOrigin, rayDirection};
+    const double rayTime = utils::randomDouble();
 
-    return r;
+    return {rayOrigin, rayDirection, rayTime};
   }
 
   [[nodiscard]] Vec3 defocusDiskSample() const {

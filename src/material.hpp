@@ -26,13 +26,13 @@ public:
 class Lambertian : public IMaterial {
 public:
   Lambertian(const Color& albedo) : mAlbedo{albedo} {};
-  bool scatter(const Ray& /**/, const HitRecord& hitInfo, Color& attenuation,
-               Ray& scattered) const override {
+  bool scatter(const Ray& incoming, const HitRecord& hitInfo,
+               Color& attenuation, Ray& scattered) const override {
     Vec3 scatterDirection = hitInfo.normal + randomUnitVector();
     if (scatterDirection.near_zero()) {
       scatterDirection = hitInfo.normal;
     }
-    scattered = Ray{hitInfo.position, scatterDirection};
+    scattered = Ray{hitInfo.position, scatterDirection, incoming.time()};
     attenuation = mAlbedo;
     return true;
   }
@@ -50,7 +50,7 @@ public:
     Vec3 reflectDirection =
         unitVector(reflect(incoming.direction(), hitInfo.normal)) +
         (mFuzz * randomUnitVector());
-    scattered = Ray{hitInfo.position, reflectDirection};
+    scattered = Ray{hitInfo.position, reflectDirection, incoming.time()};
     attenuation = mAlbedo;
     return (dot(scattered.direction(), hitInfo.normal) > 0);
   }
@@ -85,7 +85,7 @@ public:
           refract(incomingUnitDirection, hitInfo.normal, refractIndex);
     }
 
-    scattered = Ray{hitInfo.position, newDirection};
+    scattered = Ray{hitInfo.position, newDirection, incoming.time()};
     return true;
   }
 

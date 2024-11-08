@@ -7,13 +7,20 @@
 class Sphere : public Hittable {
 public:
   Sphere(const Vec3& center, double radius, std::shared_ptr<IMaterial> material)
-      : mCenter{center}, mRadius{std::fmax(0, radius)}, mMaterial{material} {};
+      : mCenter{center, {0, 0, 0}}, mRadius{std::fmax(0, radius)},
+        mMaterial{material} {};
+
+  Sphere(const Vec3& startCenter, const Vec3& endCenter, double radius,
+         std::shared_ptr<IMaterial> material)
+      : mCenter{startCenter, {endCenter - startCenter}},
+        mRadius{std::fmax(0, radius)}, mMaterial{material} {};
 
   bool hit(const Ray& ray, Interval rayRange,
            HitRecord& hitInfo) const override {
 
     // TODO: Find out why normal method produced weird visual bug?
-    Vec3 oc = mCenter - ray.origin();
+    const Vec3 currentCenter = mCenter.at(ray.time());
+    Vec3 oc = currentCenter - ray.origin();
     auto a = ray.direction().length_squared();
     auto h = dot(ray.direction(), oc);
     auto c = oc.length_squared() - mRadius * mRadius;
@@ -37,13 +44,13 @@ public:
     hitInfo.t = root;
     hitInfo.position = ray.at(root);
     hitInfo.material = mMaterial;
-    Vec3 normal = (hitInfo.position - mCenter) / mRadius;
+    Vec3 normal = (hitInfo.position - currentCenter) / mRadius;
     hitInfo.setFaceNormal(ray, normal);
     return true;
   }
 
 private:
-  Vec3 mCenter;
+  Ray mCenter;
   double mRadius;
   std::shared_ptr<IMaterial> mMaterial;
 };
