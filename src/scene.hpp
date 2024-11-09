@@ -1,11 +1,13 @@
 #pragma once
 
+#include "bvh.hpp"
 #include "camera.hpp"
 #include "hittable_list.hpp"
 #include "material.hpp"
 #include "sphere.hpp"
 #include "utils.hpp"
 #include <memory>
+
 namespace scene {
 using std::make_shared;
 using std::shared_ptr;
@@ -97,10 +99,12 @@ void oneWeekendFinalScene(HittableList& world, Camera& cam) {
   auto material3 = make_shared<Metal>(Color(0.7, 0.6, 0.5), 0.0);
   world.add(make_shared<Sphere>(Vec3(4, 1, 0), 1.0, material3));
 
+  world = HittableList(make_shared<BVHNode>(world));
+
   cam.mAspectRatio = 16.0 / 9.0;
-  cam.mImageWidth = 400;
-  cam.mSamplesPerPixel = 50;
-  cam.mMaxDepth = 50;
+  cam.mImageWidth = 1000;
+  cam.mSamplesPerPixel = 100;
+  cam.mMaxDepth = 20;
 
   cam.mVerticalFov = 20;
   cam.mLookFrom = Vec3(13, 2, 3);
