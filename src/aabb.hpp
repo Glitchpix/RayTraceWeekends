@@ -20,6 +20,13 @@ struct AxisAlignedBoundingBox {
         mZ((extremaA[2] <= extremaB[2]) ? Interval{extremaA[2], extremaB[2]}
                                         : Interval{extremaB[2], extremaA[2]}){};
 
+  AxisAlignedBoundingBox(const AxisAlignedBoundingBox& first,
+                         const AxisAlignedBoundingBox& second) {
+    mX = Interval{first.mX, second.mX};
+    mY = Interval{first.mY, second.mY};
+    mZ = Interval{first.mZ, second.mZ};
+  }
+
   [[nodiscard]] const Interval& axisInterval(size_t axisIndex) const {
     if (axisIndex == 1) {
       return mY;
@@ -59,6 +66,19 @@ struct AxisAlignedBoundingBox {
     }
     return true;
   }
+
+  [[nodiscard]] size_t longestAxis() const {
+    if (mX.size() > mY.size()) {
+      return mX.size() > mZ.size() ? 0 : 2;
+    }
+    return mY.size() > mZ.size() ? 1 : 2;
+  }
+  static const AxisAlignedBoundingBox empty, universe;
 };
 
 using AABB = AxisAlignedBoundingBox;
+
+const AABB AABB::empty =
+    AABB{Interval::empty, Interval::empty, Interval::empty};
+const AABB AABB::universe =
+    AABB{Interval::universe, Interval::universe, Interval::universe};

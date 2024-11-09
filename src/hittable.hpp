@@ -1,5 +1,6 @@
 #pragma once
 
+#include "aabb.hpp"
 #include "interval.hpp"
 #include "ray.hpp"
 #include "vec3.hpp"
@@ -23,12 +24,15 @@ struct HitRecord {
 class Hittable {
 public:
   Hittable() = default;
-  Hittable(const Hittable&) = delete;
-  Hittable(Hittable&&) = delete;
-  Hittable& operator=(const Hittable&) = delete;
-  Hittable& operator=(Hittable&&) = delete;
   virtual ~Hittable() = default;
 
   virtual bool hit(const Ray& ray, Interval rayRange,
                    HitRecord& hitInfo) const = 0;
+  [[nodiscard]] virtual AABB boundingBox() const = 0;
+
+protected:
+  Hittable(const Hittable&) = default;
+  Hittable(Hittable&&) = default;
+  Hittable& operator=(const Hittable&) = default;
+  Hittable& operator=(Hittable&&) = default;
 };

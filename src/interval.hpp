@@ -9,6 +9,10 @@ public:
 
   constexpr Interval(double min, double max) : mMin{min}, mMax{max} {};
 
+  constexpr Interval(const Interval& first, const Interval& second)
+      : mMin(first.min() <= second.min() ? first.min() : second.min()),
+        mMax(first.max() >= second.max() ? first.max() : second.max()) {}
+
   [[nodiscard]] double min() const { return mMin; }
   [[nodiscard]] double max() const { return mMax; }
 
