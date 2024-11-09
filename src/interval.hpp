@@ -22,12 +22,17 @@ public:
     return std::clamp(x, mMin, mMax);
   }
 
+  [[nodiscard]] Interval expand(double delta) const {
+    auto padding = delta / 2;
+    return {mMin - padding, mMax + padding};
+  }
+
   static const Interval empty, universe;
 
 private:
   double mMin, mMax;
 };
 
-const auto Interval::empty = Interval{};
-const auto Interval::universe =
+constexpr auto Interval::empty = Interval{};
+constexpr auto Interval::universe =
     Interval{-utils::INFINITE_DOUBLE, +utils::INFINITE_DOUBLE};
