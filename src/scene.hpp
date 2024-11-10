@@ -2,9 +2,11 @@
 
 #include "bvh.hpp"
 #include "camera.hpp"
+#include "color.hpp"
 #include "hittable_list.hpp"
 #include "material.hpp"
 #include "sphere.hpp"
+#include "texture.hpp"
 #include "utils.hpp"
 #include <memory>
 
@@ -56,7 +58,9 @@ void twoOppositeSphere(HittableList& world) {
 }
 
 void oneWeekendFinalScene(HittableList& world, Camera& cam) {
-  auto ground_material = make_shared<Lambertian>(Color(0.5, 0.5, 0.5));
+  auto checkerTexture = make_shared<CheckerTexture>(0.32, Color{.65, 0.3, .3},
+                                                    Color{.3, .3, .65});
+  auto ground_material = make_shared<Lambertian>(checkerTexture);
   world.add(make_shared<Sphere>(Vec3(0, -1000, 0), 1000, ground_material));
 
   for (int a = -11; a < 11; a++) {
@@ -102,8 +106,8 @@ void oneWeekendFinalScene(HittableList& world, Camera& cam) {
   world = HittableList(make_shared<BVHNode>(world));
 
   cam.mAspectRatio = 16.0 / 9.0;
-  cam.mImageWidth = 1000;
-  cam.mSamplesPerPixel = 100;
+  cam.mImageWidth = 600;
+  cam.mSamplesPerPixel = 64;
   cam.mMaxDepth = 20;
 
   cam.mVerticalFov = 20;
@@ -113,5 +117,27 @@ void oneWeekendFinalScene(HittableList& world, Camera& cam) {
 
   cam.mDefocusAngle = 0.6;
   cam.mFocusDistance = 10.0;
+}
+
+void checkeredSpheres(HittableList& world, Camera& cam) {
+  auto checker =
+      make_shared<CheckerTexture>(0.32, Color{.2, .3, .1}, Color{.9, .9, .9});
+
+  world.add(make_shared<Sphere>(Vec3{0, -10, 0}, 10,
+                                make_shared<Lambertian>(checker)));
+  world.add(make_shared<Sphere>(Vec3{0, 10, 0}, 10,
+                                make_shared<Lambertian>(checker)));
+
+  cam.mAspectRatio = 16.0 / 9.0;
+  cam.mImageWidth = 400;
+  cam.mSamplesPerPixel = 100;
+  cam.mMaxDepth = 50;
+
+  cam.mVerticalFov = 20;
+  cam.mLookFrom = Vec3{13, 2, 3};
+  cam.mLookAt = Vec3{0, 0, 0};
+  cam.mUp = Vec3{0, 1, 0};
+
+  cam.mDefocusAngle = 0;
 }
 }; // namespace scene
