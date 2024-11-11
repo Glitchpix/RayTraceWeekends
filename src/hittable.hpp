@@ -3,6 +3,7 @@
 #include "aabb.hpp"
 #include "interval.hpp"
 #include "ray.hpp"
+#include "vec2.hpp"
 #include "vec3.hpp"
 #include <memory>
 
@@ -13,8 +14,7 @@ struct HitRecord {
   Vec3 normal;
   std::shared_ptr<IMaterial> material;
   double t{};
-  double u{};
-  double v{};
+  Vec2 uv;
   bool frontFace{};
 
   void setFaceNormal(const Ray& ray, const Vec3& outwardNormal) {

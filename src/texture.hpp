@@ -1,9 +1,10 @@
 #pragma once
 
 #include "src/color.hpp"
+#include "vec2.hpp"
 class Texture {
 public:
-  [[nodiscard]] virtual Color value(double u, double v,
+  [[nodiscard]] virtual Color value(const Vec2& uvCoords,
                                     const Vec3& point) const = 0;
   virtual ~Texture() = default;
 
@@ -22,10 +23,9 @@ public:
   SolidColor(double red, double green, double blue)
       : SolidColor(Color{red, green, blue}) {}
 
-  [[nodiscard]] Color value(double u, double v,
+  [[nodiscard]] Color value(const Vec2& uvCoords,
                             const Vec3& point) const override {
-    (void)u;
-    (void)v;
+    (void)uvCoords;
     (void)point;
     return mAlbedo;
   }
@@ -44,7 +44,7 @@ public:
       : CheckerTexture(scale, std::make_shared<SolidColor>(c1),
                        std::make_shared<SolidColor>(c2)) {}
 
-  [[nodiscard]] Color value(double u, double v,
+  [[nodiscard]] Color value(const Vec2& uvCoords,
                             const Vec3& point) const override {
     auto xInteger = int(std::floor(mInverseScale * point.x()));
     auto yInteger = int(std::floor(mInverseScale * point.y()));
@@ -52,11 +52,21 @@ public:
 
     bool isEven = (xInteger + yInteger + zInteger) % 2 == 0;
 
-    return isEven ? mEven->value(u, v, point) : mOdd->value(u, v, point);
+    return isEven ? mEven->value(uvCoords, point)
+                  : mOdd->value(uvCoords, point);
   }
 
 private:
   double mInverseScale;
   std::shared_ptr<Texture> mEven;
   std::shared_ptr<Texture> mOdd;
+};
+
+class UVTexture : public Texture {
+public:
+  [[nodiscard]] Color value(const Vec2& uvCoords,
+                            const Vec3& point) const override {
+    (void)point;
+    return Color{uvCoords.u, uvCoords.v, 0.0};
+  }
 };

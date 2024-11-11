@@ -38,7 +38,7 @@ public:
       scatterDirection = hitInfo.normal;
     }
     scattered = Ray{hitInfo.position, scatterDirection, incoming.time()};
-    attenuation = mAlbedo->value(hitInfo.u, hitInfo.v, hitInfo.position);
+    attenuation = mAlbedo->value(hitInfo.uv, hitInfo.position);
     return true;
   }
 
