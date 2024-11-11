@@ -188,4 +188,25 @@ void coolSpheres(HittableList& world, Camera& cam) {
 
   cam.mDefocusAngle = 0;
 }
+
+void UVTest(HittableList& world, Camera& cam) {
+  auto uvTexture = make_shared<UVTexture>();
+
+  world.add(make_shared<Sphere>(Vec3{0, -5, 0}, 5,
+                                make_shared<Lambertian>(uvTexture)));
+  world.add(make_shared<Sphere>(Vec3{0, 5, 0}, 5,
+                                make_shared<Lambertian>(uvTexture)));
+
+  cam.mAspectRatio = 16.0 / 9.0;
+  cam.mImageWidth = 400;
+  cam.mSamplesPerPixel = 100;
+  cam.mMaxDepth = 50;
+
+  cam.mVerticalFov = 70;
+  cam.mLookFrom = Vec3{-15, 2, 3};
+  cam.mLookAt = Vec3{0, 0, 0};
+  cam.mUp = Vec3{0, 1, 0};
+
+  cam.mDefocusAngle = 0;
+}
 }; // namespace scene
