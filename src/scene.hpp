@@ -140,4 +140,52 @@ void checkeredSpheres(HittableList& world, Camera& cam) {
 
   cam.mDefocusAngle = 0;
 }
+
+void coolSpheres(HittableList& world, Camera& cam) {
+  auto materialGround = make_shared<Lambertian>(Color(0.8, 0.8, 0.0));
+  auto materialCenter = make_shared<Lambertian>(Color(0.1, 0.2, 0.5));
+  auto materialLeft = make_shared<Dielectric>(1.51);
+  auto materialBubble = make_shared<Dielectric>(1.00 / 1.51);
+  auto materialRight = make_shared<Metal>(Color(0.75, 0.2, 0.2), 0.05);
+  auto checker =
+      make_shared<CheckerTexture>(0.32, Color{.2, .3, .1}, Color{.9, .9, .9});
+
+  auto albedo = Color::random(0.5, 1);
+  auto materialRandA = make_shared<Lambertian>(albedo);
+  albedo = Color::random(0.5, 1);
+  auto materialRandB = make_shared<Lambertian>(albedo);
+  albedo = Color::random(0.5, 1);
+  auto materialRandC = make_shared<Lambertian>(albedo);
+  albedo = Color::random(0.5, 1);
+  auto materialRandD = make_shared<Lambertian>(albedo);
+
+  world.add(make_shared<Sphere>(Vec3{0, -10, 0}, 10, materialRight));
+  world.add(make_shared<Sphere>(Vec3{0, 10, 0}, 10, materialLeft));
+
+  world.add(make_shared<Sphere>(Vec3{0, 0, 10}, 2.5, materialRandA));
+  world.add(make_shared<Sphere>(Vec3{0, 0, -10}, 3.5, materialGround));
+  world.add(make_shared<Sphere>(Vec3{-10, 0, 10}, 4, materialRandD));
+  world.add(make_shared<Sphere>(Vec3{-10, 0, -10}, 3, materialRandB));
+  world.add(make_shared<Sphere>(Vec3{-20, 0, 10}, 6, materialCenter));
+  world.add(make_shared<Sphere>(Vec3{-20, 0, -10}, 7, materialRandC));
+  // world.add(make_shared<Sphere>(Vec3{0, 10, 0}, 10, materialLeft));
+  // world.add(make_shared<Sphere>(Vec3{0, 10, 0}, 10, materialLeft));
+
+  // world.add(make_shared<Sphere>(Vec3{0, 0, 0}, 50,
+  // make_shared<Dielectric>(checker)));
+
+  world = HittableList(make_shared<BVHNode>(world));
+
+  cam.mAspectRatio = 8.0 / 2.0;
+  cam.mImageWidth = 1200;
+  cam.mSamplesPerPixel = 500;
+  cam.mMaxDepth = 50;
+
+  cam.mVerticalFov = 20;
+  cam.mLookFrom = Vec3{15, 2, 3};
+  cam.mLookAt = Vec3{0, 0, 0};
+  cam.mUp = Vec3{0, 1, 0};
+
+  cam.mDefocusAngle = 0;
+}
 }; // namespace scene

@@ -8,7 +8,7 @@ int main() {
   HittableList world{};
   Camera cam;
 
-  scene::checkeredSpheres(world, cam);
+  scene::coolSpheres(world, cam);
 
   auto t1 = std::chrono::high_resolution_clock::now();
   cam.render(world);
