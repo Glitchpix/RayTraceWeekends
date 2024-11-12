@@ -3,6 +3,7 @@
 #include "color.hpp"
 #include "image.hpp"
 #include "interval.hpp"
+#include "perlin.hpp"
 #include "vec2.hpp"
 class Texture {
 public:
@@ -104,4 +105,16 @@ public:
 private:
   static constexpr Color mDebugColor = Color{0, 1, 1};
   Image mImage;
+};
+
+class NoiseTexture : public Texture {
+public:
+  [[nodiscard]] Color value(const Vec2& uvCoords,
+                            const Vec3& point) const override {
+    (void)uvCoords;
+    return color::White * noise.noise(point);
+  }
+
+private:
+  Perlin noise;
 };
