@@ -14,7 +14,7 @@ struct HitRecord {
   Vec3 normal;
   std::shared_ptr<IMaterial> material;
   double t{};
-  Vec2 uv;
+  Vec2<double> uv;
   bool frontFace{};
 
   void setFaceNormal(const Ray& ray, const Vec3& outwardNormal) {

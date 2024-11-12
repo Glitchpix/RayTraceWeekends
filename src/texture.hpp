@@ -7,7 +7,7 @@
 #include "vec2.hpp"
 class Texture {
 public:
-  [[nodiscard]] virtual Color value(const Vec2& uvCoords,
+  [[nodiscard]] virtual Color value(const Vec2<double>& uvCoords,
                                     const Vec3& point) const = 0;
   virtual ~Texture() = default;
 
@@ -26,7 +26,7 @@ public:
   SolidColor(double red, double green, double blue)
       : SolidColor(Color{red, green, blue}) {}
 
-  [[nodiscard]] Color value(const Vec2& uvCoords,
+  [[nodiscard]] Color value(const Vec2<double>& uvCoords,
                             const Vec3& point) const override {
     (void)uvCoords;
     (void)point;
@@ -47,7 +47,7 @@ public:
       : CheckerTexture(scale, std::make_shared<SolidColor>(c1),
                        std::make_shared<SolidColor>(c2)) {}
 
-  [[nodiscard]] Color value(const Vec2& uvCoords,
+  [[nodiscard]] Color value(const Vec2<double>& uvCoords,
                             const Vec3& point) const override {
     auto xInteger = int(std::floor(mInverseScale * point.x()));
     auto yInteger = int(std::floor(mInverseScale * point.y()));
@@ -67,7 +67,7 @@ private:
 
 class UVTexture : public Texture {
 public:
-  [[nodiscard]] Color value(const Vec2& uvCoords,
+  [[nodiscard]] Color value(const Vec2<double>& uvCoords,
                             const Vec3& point) const override {
     (void)point;
     return Color{uvCoords.u, uvCoords.v, 0.0};
@@ -78,7 +78,7 @@ class ImageTexture : public Texture {
 public:
   ImageTexture(const char* filename) : mImage(filename){};
 
-  [[nodiscard]] Color value(const Vec2& uvCoords,
+  [[nodiscard]] Color value(const Vec2<double>& uvCoords,
                             const Vec3& point) const override {
     (void)point;
     if (mImage.height() <= 0) {
@@ -109,7 +109,7 @@ private:
 
 class NoiseTexture : public Texture {
 public:
-  [[nodiscard]] Color value(const Vec2& uvCoords,
+  [[nodiscard]] Color value(const Vec2<double>& uvCoords,
                             const Vec3& point) const override {
     (void)uvCoords;
     return color::White * noise.noise(point);

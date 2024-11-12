@@ -68,7 +68,7 @@ private:
   std::shared_ptr<IMaterial> mMaterial;
   AABB mBoundingBox;
 
-  static Vec2 getSphereUV(const Vec3& point) {
+  static Vec2<double> getSphereUV(const Vec3& point) {
     // point: a given point on the sphere of radius one, centered at the origin.
     // u: returned value [0,1] of angle around the Y axis from X=-1.
     // v: returned value [0,1] of angle from Y=-1 to Y=+1.

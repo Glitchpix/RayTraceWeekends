@@ -1,13 +1,14 @@
 #pragma once
 
+template <class T = double>
 struct Vec2 {
   union {
-    double x, u;
+    T x, u;
   };
   union {
-    double y, v;
+    T y, v;
   };
 
   Vec2() = default;
-  Vec2(double x, double y) : x{x}, y{y} {};
+  Vec2(T x, T y) : x{x}, y{y} {};
 };

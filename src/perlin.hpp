@@ -1,17 +1,18 @@
 #pragma once
+#include "intVec3.hpp"
 #include "utils.hpp"
 #include "vec3.hpp"
+#include <cstddef>
+#include <utility>
 
 class Perlin {
 public:
   Perlin() {
-    for (double& i : randfloat) {
+    for (double& i : mRandomValues) {
       i = utils::randomDouble();
     }
 
-    perlin_generate_perm(perm_x);
-    perlin_generate_perm(perm_y);
-    perlin_generate_perm(perm_z);
+    generatePermutations(mPermutations);
   }
 
   [[nodiscard]] double noise(const Vec3& p) const {
@@ -19,29 +20,30 @@ public:
     auto j = int(4 * p.y()) & 255;
     auto k = int(4 * p.z()) & 255;
 
-    return randfloat[perm_x[i] ^ perm_y[j] ^ perm_z[k]];
+    auto index = mPermutations[size_t(i)].x ^ mPermutations[size_t(j)].y ^
+                 mPermutations[size_t(k)].z;
+
+    return mRandomValues[size_t(index)];
   }
 
 private:
-  static const int point_count = 256;
-  double randfloat[point_count];
-  int perm_x[point_count];
-  int perm_y[point_count];
-  int perm_z[point_count];
+  static const int kPointCount = 256;
+  std::array<double, kPointCount> mRandomValues;
+  std::array<TVec3<int>, kPointCount> mPermutations;
 
-  static void perlin_generate_perm(int* p) {
-    for (int i = 0; i < point_count; i++)
-      p[i] = i;
+  static void
+  generatePermutations(std::array<TVec3<int>, kPointCount>& points) {
+    for (int i = 0; i < kPointCount; i++) {
+      points[size_t(i)] = TVec3<int>{i, i, i};
+    }
 
-    permute(p, point_count);
+    permute(points, kPointCount);
   }
 
-  static void permute(int* p, int n) {
-    for (int i = n - 1; i > 0; i--) {
-      int target = utils::randomInt(0, i);
-      int tmp = p[i];
-      p[i] = p[target];
-      p[target] = tmp;
+  static void permute(std::array<TVec3<int>, kPointCount>& points, size_t n) {
+    for (size_t i = n - 1; i > 0; i--) {
+      auto target = static_cast<size_t>(utils::randomInt(0, int(i)));
+      std::swap(points[i], points[target]);
     }
   }
 };
