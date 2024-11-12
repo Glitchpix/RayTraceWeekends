@@ -209,4 +209,21 @@ void UVTest(HittableList& world, Camera& cam) {
 
   cam.mDefocusAngle = 0;
 }
+void earth(HittableList& world, Camera& cam) {
+  auto earthTexture = make_shared<ImageTexture>("earthmap.jpg");
+  auto earthSurface = make_shared<Lambertian>(earthTexture);
+  auto globe = make_shared<Sphere>(Vec3(0, 0, 0), 2, earthSurface);
+
+  world.add(globe);
+
+  cam.mAspectRatio = 16.0 / 9.0;
+  cam.mImageWidth = 400;
+  cam.mSamplesPerPixel = 100;
+  cam.mMaxDepth = 50;
+
+  cam.mVerticalFov = 20;
+  cam.mLookFrom = Vec3(0, 0, 12);
+  cam.mLookAt = Vec3(0, 0, 0);
+  cam.mUp = Vec3(0, 1, 0);
+}
 }; // namespace scene
