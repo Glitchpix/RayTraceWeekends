@@ -226,4 +226,22 @@ void earth(HittableList& world, Camera& cam) {
   cam.mLookAt = Vec3(0, 0, 0);
   cam.mUp = Vec3(0, 1, 0);
 }
+
+void perlin_spheres(HittableList& world, Camera& cam) {
+  auto pertext = make_shared<NoiseTexture>();
+  world.add(make_shared<Sphere>(Vec3(0, -1000, 0), 1000,
+                                make_shared<Lambertian>(pertext)));
+  world.add(
+      make_shared<Sphere>(Vec3(0, 2, 0), 2, make_shared<Lambertian>(pertext)));
+
+  cam.mAspectRatio = 16.0 / 9.0;
+  cam.mImageWidth = 400;
+  cam.mSamplesPerPixel = 100;
+  cam.mMaxDepth = 50;
+
+  cam.mVerticalFov = 20;
+  cam.mLookFrom = Vec3(13, 2, 3);
+  cam.mLookAt = Vec3(0, 0, 0);
+  cam.mUp = Vec3(0, 1, 0);
+}
 }; // namespace scene
