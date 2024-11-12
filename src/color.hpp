@@ -34,9 +34,14 @@ void write(std::ostream& out, const Color& pixel_color) {
   out << rbyte << ' ' << gbyte << ' ' << bbyte << '\n';
 }
 
-const static Color Black{0, 0, 0};
-const static Color White{1, 1, 1};
-const static Color Red{1, 0, 0};
-const static Color Green{0, 1, 0};
-const static Color Blue{0, 0, 1};
+static constexpr Color Black{0, 0, 0};
+static constexpr Color White{1, 1, 1};
+static constexpr Color Red{1, 0, 0};
+static constexpr Color Green{0, 1, 0};
+static constexpr Color Blue{0, 0, 1};
+
+static constexpr Color mDebugColor = Color{0, 1, 1};
+
+static constexpr int maxIntegerColorValue = 255;
+static constexpr float maxIntegerFloatValue = 255.0;
 } // namespace color

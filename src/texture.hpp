@@ -1,6 +1,8 @@
 #pragma once
 
-#include "src/color.hpp"
+#include "color.hpp"
+#include "image.hpp"
+#include "interval.hpp"
 #include "vec2.hpp"
 class Texture {
 public:
@@ -69,4 +71,37 @@ public:
     (void)point;
     return Color{uvCoords.u, uvCoords.v, 0.0};
   }
+};
+
+class ImageTexture : public Texture {
+public:
+  ImageTexture(const char* filename) : mImage(filename){};
+
+  [[nodiscard]] Color value(const Vec2& uvCoords,
+                            const Vec3& point) const override {
+    (void)point;
+    if (mImage.height() <= 0) {
+      return mDebugColor;
+    }
+
+    double u = uvCoords.u;
+    double v = uvCoords.v;
+
+    u = Interval{0, 1}.clamp(u);
+    v = 1.0 - Interval{0, 1}.clamp(v);
+
+    auto uIntCoord = int(u * mImage.width());
+    auto vIntCoord = int(v * mImage.height());
+
+    auto pixelData = mImage.pixelData(uIntCoord, vIntCoord);
+
+    auto r = pixelData[0];
+    auto g = pixelData[1];
+    auto b = pixelData[2];
+    return {r, g, b};
+  }
+
+private:
+  static constexpr Color mDebugColor = Color{0, 1, 1};
+  Image mImage;
 };
