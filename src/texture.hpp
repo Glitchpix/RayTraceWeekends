@@ -109,12 +109,14 @@ private:
 
 class NoiseTexture : public Texture {
 public:
+  NoiseTexture(double scale) : scale{scale} {}
   [[nodiscard]] Color value(const Vec2<double>& uvCoords,
                             const Vec3& point) const override {
     (void)uvCoords;
-    return color::White * noise.noise(point);
+    return color::White * noise.noise(scale * point);
   }
 
 private:
   Perlin noise;
+  double scale;
 };

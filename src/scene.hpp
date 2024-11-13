@@ -228,7 +228,7 @@ void earth(HittableList& world, Camera& cam) {
 }
 
 void perlin_spheres(HittableList& world, Camera& cam) {
-  auto pertext = make_shared<NoiseTexture>();
+  auto pertext = make_shared<NoiseTexture>(4);
   world.add(make_shared<Sphere>(Vec3(0, -1000, 0), 1000,
                                 make_shared<Lambertian>(pertext)));
   world.add(
