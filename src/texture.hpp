@@ -113,7 +113,7 @@ public:
   [[nodiscard]] Color value(const Vec2<double>& uvCoords,
                             const Vec3& point) const override {
     (void)uvCoords;
-    return color::White * noise.noise(scale * point);
+    return color::White * (1.0 + noise.noise(scale * point)) * 0.5;
   }
 
 private:

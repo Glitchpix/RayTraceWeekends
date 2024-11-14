@@ -8,8 +8,8 @@
 class Perlin {
 public:
   Perlin() {
-    for (double& i : mRandomValues) {
-      i = utils::randomDouble();
+    for (Vec3& i : mRandomValues) {
+      i = unitVector(Vec3::random(-1.0, 1.0));
     }
 
     generatePermutations(mPermutations);
@@ -19,14 +19,11 @@ public:
     auto u = p.x() - std::floor(p.x());
     auto v = p.y() - std::floor(p.y());
     auto w = p.z() - std::floor(p.z());
-    u = u * u * (3 - 2 * u);
-    v = v * v * (3 - 2 * v);
-    w = w * w * (3 - 2 * w);
 
     auto i = int(std::floor(p.x()));
     auto j = int(std::floor(p.y()));
     auto k = int(std::floor(p.z()));
-    double c[2][2][2];
+    Vec3 c[2][2][2];
 
     for (int di = 0; di < 2; di++) {
       for (int dj = 0; dj < 2; dj++) {
@@ -42,12 +39,12 @@ public:
       }
     }
 
-    return trilinearInterpolation(c, u, v, w);
+    return perlinInterpolation(c, u, v, w);
   }
 
 private:
   static const int kPointCount = 256;
-  std::array<double, kPointCount> mRandomValues;
+  std::array<Vec3, kPointCount> mRandomValues;
   std::array<TVec3<int>, kPointCount> mPermutations;
 
   static void
@@ -65,14 +62,20 @@ private:
       std::swap(points[i], points[target]);
     }
   }
-  static double trilinearInterpolation(double c[2][2][2], double u, double v,
-                                       double w) {
+  static double perlinInterpolation(const Vec3 c[2][2][2], double u, double v,
+                                    double w) {
+    auto uu = u * u * (3 - 2 * u);
+    auto vv = v * v * (3 - 2 * v);
+    auto ww = w * w * (3 - 2 * w);
     auto accum = 0.0;
+
     for (int i = 0; i < 2; i++) {
       for (int j = 0; j < 2; j++) {
         for (int k = 0; k < 2; k++) {
-          accum += (i * u + (1 - i) * (1 - u)) * (j * v + (1 - j) * (1 - v)) *
-                   (k * w + (1 - k) * (1 - w)) * c[i][j][k];
+          Vec3 weight_v(u - i, v - j, w - k);
+          accum += (i * uu + (1 - i) * (1 - uu)) *
+                   (j * vv + (1 - j) * (1 - vv)) *
+                   (k * ww + (1 - k) * (1 - ww)) * dot(c[i][j][k], weight_v);
         }
       }
     }
