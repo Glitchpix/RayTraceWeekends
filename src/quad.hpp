@@ -11,9 +11,11 @@ public:
        std::shared_ptr<IMaterial> material)
       : mPosition{position}, mWidthVector{widthVector},
         mHeightVector{heightVector},
-        mNormal{unitVector(cross(mWidthVector, mHeightVector))},
+        mNormal{cross(mWidthVector, mHeightVector)},
+        mW{mNormal / dot(mNormal, mNormal)},
         mDistanceFromOrigin{dot(mPosition, mNormal)}, mMaterial{material} {
     setBoundingBox();
+    mNormal = unitVector(mNormal);
   }
 
   bool hit(const Ray& ray, Interval rayRange,
@@ -33,6 +35,14 @@ public:
 
     const auto intersection = ray.at(t);
 
+    Vec3 planeHitVector = intersection - mPosition;
+    auto alpha = dot(mW, cross(planeHitVector, mHeightVector));
+    auto beta = dot(mW, cross(mWidthVector, planeHitVector));
+
+    if (!isInterior(alpha, beta, hitInfo)) {
+      return false;
+    }
+
     hitInfo.t = t;
     hitInfo.position = intersection;
     hitInfo.material = mMaterial;
@@ -48,6 +58,7 @@ private:
   Vec3 mWidthVector;
   Vec3 mHeightVector;
   Vec3 mNormal;
+  Vec3 mW;
   double mDistanceFromOrigin{0};
   std::shared_ptr<IMaterial> mMaterial;
   AABB mBoundingBox;
@@ -60,5 +71,15 @@ private:
     const auto secondDiagonal =
         AABB{mPosition + mWidthVector, mPosition + mHeightVector};
     mBoundingBox = {firstDiagonal, secondDiagonal};
+  }
+
+  static bool isInterior(double a, double b, HitRecord& hitInfo) {
+    const auto unitInterval = Interval(0, 1);
+
+    if (unitInterval.contains(a) && unitInterval.contains(b)) {
+      hitInfo.uv = {a, b};
+      return true;
+    }
+    return false;
   }
 };
