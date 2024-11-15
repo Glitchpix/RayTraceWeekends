@@ -46,6 +46,7 @@ void defaultScene(HittableList& world, Camera& cam) {
 
   cam.mDefocusAngle = 10.0;
   cam.mFocusDistance = 3.4;
+  cam.mBackgroundColor = Color(0.5, 0.7, 1.0);
 }
 
 void twoOppositeSphere(HittableList& world) {
@@ -118,6 +119,7 @@ void oneWeekendFinalScene(HittableList& world, Camera& cam) {
 
   cam.mDefocusAngle = 0.6;
   cam.mFocusDistance = 10.0;
+  cam.mBackgroundColor = Color(0.5, 0.7, 1.0);
 }
 
 void checkeredSpheres(HittableList& world, Camera& cam) {
@@ -140,6 +142,7 @@ void checkeredSpheres(HittableList& world, Camera& cam) {
   cam.mUp = Vec3{0, 1, 0};
 
   cam.mDefocusAngle = 0;
+  cam.mBackgroundColor = Color(0.5, 0.7, 1.0);
 }
 
 void coolSpheres(HittableList& world, Camera& cam) {
@@ -188,6 +191,7 @@ void coolSpheres(HittableList& world, Camera& cam) {
   cam.mUp = Vec3{0, 1, 0};
 
   cam.mDefocusAngle = 0;
+  cam.mBackgroundColor = Color(0.5, 0.7, 1.0);
 }
 
 void UVTest(HittableList& world, Camera& cam) {
@@ -209,6 +213,7 @@ void UVTest(HittableList& world, Camera& cam) {
   cam.mUp = Vec3{0, 1, 0};
 
   cam.mDefocusAngle = 0;
+  cam.mBackgroundColor = Color(0.5, 0.7, 1.0);
 }
 void earth(HittableList& world, Camera& cam) {
   auto earthTexture = make_shared<ImageTexture>("earthmap.jpg");
@@ -226,6 +231,7 @@ void earth(HittableList& world, Camera& cam) {
   cam.mLookFrom = Vec3(0, 0, 12);
   cam.mLookAt = Vec3(0, 0, 0);
   cam.mUp = Vec3(0, 1, 0);
+  cam.mBackgroundColor = Color(0.5, 0.7, 1.0);
 }
 
 void perlin_spheres(HittableList& world, Camera& cam) {
@@ -244,6 +250,7 @@ void perlin_spheres(HittableList& world, Camera& cam) {
   cam.mLookFrom = Vec3(13, 2, 3);
   cam.mLookAt = Vec3(0, 0, 0);
   cam.mUp = Vec3(0, 1, 0);
+  cam.mBackgroundColor = Color(0.5, 0.7, 1.0);
 }
 
 void quadScene(HittableList& world, Camera& cam) {
@@ -277,7 +284,7 @@ void quadScene(HittableList& world, Camera& cam) {
   world.add(make_shared<Sphere>(Vec3(0, 0, 3), 1.0, materialGlass));
 
   cam.mAspectRatio = 1.0;
-  cam.mImageWidth = 800;
+  cam.mImageWidth = 500;
   cam.mSamplesPerPixel = 200;
   cam.mMaxDepth = 50;
 
@@ -287,5 +294,6 @@ void quadScene(HittableList& world, Camera& cam) {
   cam.mUp = Vec3(0, 1, 0);
 
   cam.mDefocusAngle = 0;
+  cam.mBackgroundColor = Color(0.5, 0.7, 1.0);
 }
 }; // namespace scene

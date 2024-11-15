@@ -3,6 +3,7 @@
 #include "color.hpp"
 #include "hittable.hpp"
 #include "texture.hpp"
+#include "vec2.hpp"
 #include "vec3.hpp"
 #include <cmath>
 #include <memory>
@@ -23,6 +24,12 @@ public:
     (void)attenuation;
     (void)scattered;
     return false;
+  }
+
+  virtual Color emitted(const Vec2<double>& uv, const Vec3& point) {
+    (void)uv;
+    (void)point;
+    return color::Black;
   }
 };
 
@@ -102,4 +109,18 @@ private:
     r0 = r0 * r0;
     return r0 + (1 - r0) * std::pow((1 - cosine), 5);
   }
+};
+
+class DiffuseLight : public IMaterial {
+public:
+  DiffuseLight(std::shared_ptr<Texture> texture) : mTexture{texture} {}
+  DiffuseLight(const Color& emit)
+      : mTexture{std::make_shared<SolidColor>(emit)} {}
+
+  Color emitted(const Vec2<double>& uv, const Vec3& point) override {
+    return mTexture->value(uv, point);
+  }
+
+private:
+  std::shared_ptr<Texture> mTexture;
 };
