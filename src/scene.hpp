@@ -296,4 +296,29 @@ void quadScene(HittableList& world, Camera& cam) {
   cam.mDefocusAngle = 0;
   cam.mBackgroundColor = Color(0.5, 0.7, 1.0);
 }
+
+void simpleLight(HittableList& world, Camera& cam) {
+  auto pertext = make_shared<NoiseTexture>(4);
+  world.add(make_shared<Sphere>(Vec3(0, -1000, 0), 1000,
+                                make_shared<Lambertian>(pertext)));
+  world.add(
+      make_shared<Sphere>(Vec3(0, 2, 0), 2, make_shared<Lambertian>(pertext)));
+
+  auto difflight = make_shared<DiffuseLight>(Color(4, 4, 4));
+  world.add(make_shared<Quad>(Vec3(3, 1, -2), Vec3(2, 0, 0), Vec3(0, 2, 0),
+                              difflight));
+
+  cam.mAspectRatio = 16.0 / 9.0;
+  cam.mImageWidth = 400;
+  cam.mSamplesPerPixel = 1000;
+  cam.mMaxDepth = 50;
+  cam.mBackgroundColor = Color(0, 0, 0);
+
+  cam.mVerticalFov = 20;
+  cam.mLookFrom = Vec3(26, 3, 6);
+  cam.mLookAt = Vec3(0, 2, 0);
+  cam.mUp = Vec3(0, 1, 0);
+
+  cam.mDefocusAngle = 0;
+}
 }; // namespace scene
