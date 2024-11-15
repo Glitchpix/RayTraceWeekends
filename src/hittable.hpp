@@ -11,16 +11,21 @@ class IMaterial;
 
 struct HitRecord {
   Vec3 position;
-  Vec3 normal;
   std::shared_ptr<IMaterial> material;
   double t{};
   Vec2<double> uv;
-  bool frontFace{};
 
   void setFaceNormal(const Ray& ray, const Vec3& outwardNormal) {
     frontFace = dot(ray.direction(), outwardNormal) < 0;
-    normal = frontFace ? outwardNormal : -outwardNormal;
+    mNormal = frontFace ? outwardNormal : -outwardNormal;
   }
+
+  [[nodiscard]] const Vec3& normal() const { return mNormal; }
+  [[nodiscard]] bool frontFacing() const { return frontFace; }
+
+private:
+  bool frontFace{};
+  Vec3 mNormal;
 };
 
 class Hittable {

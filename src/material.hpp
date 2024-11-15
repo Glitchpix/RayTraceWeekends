@@ -33,9 +33,9 @@ public:
   Lambertian(std::shared_ptr<Texture> texture) : mAlbedo{texture} {};
   bool scatter(const Ray& incoming, const HitRecord& hitInfo,
                Color& attenuation, Ray& scattered) const override {
-    Vec3 scatterDirection = hitInfo.normal + randomUnitVector();
+    Vec3 scatterDirection = hitInfo.normal() + randomUnitVector();
     if (scatterDirection.near_zero()) {
-      scatterDirection = hitInfo.normal;
+      scatterDirection = hitInfo.normal();
     }
     scattered = Ray{hitInfo.position, scatterDirection, incoming.time()};
     attenuation = mAlbedo->value(hitInfo.uv, hitInfo.position);
@@ -53,11 +53,11 @@ public:
   bool scatter(const Ray& incoming, const HitRecord& hitInfo,
                Color& attenuation, Ray& scattered) const override {
     Vec3 reflectDirection =
-        unitVector(reflect(incoming.direction(), hitInfo.normal)) +
+        unitVector(reflect(incoming.direction(), hitInfo.normal())) +
         (mFuzz * randomUnitVector());
     scattered = Ray{hitInfo.position, reflectDirection, incoming.time()};
     attenuation = mAlbedo;
-    return (dot(scattered.direction(), hitInfo.normal) > 0);
+    return (dot(scattered.direction(), hitInfo.normal()) > 0);
   }
 
 private:
@@ -72,22 +72,22 @@ public:
                Color& attenuation, Ray& scattered) const override {
     attenuation = color::White;
     double refractIndex =
-        hitInfo.frontFace ? (1.0 / mRefractionIndex) : mRefractionIndex;
+        hitInfo.frontFacing() ? (1.0 / mRefractionIndex) : mRefractionIndex;
 
     Vec3 incomingUnitDirection = unitVector(incoming.direction());
 
     double cosTheta =
-        std::fmin(dot(-incomingUnitDirection, hitInfo.normal), 1.0);
+        std::fmin(dot(-incomingUnitDirection, hitInfo.normal()), 1.0);
     double sinTheta = std::sqrt(1.0 - cosTheta * cosTheta);
 
     bool totalInternalReflection = refractIndex * sinTheta > 1.0;
     Vec3 newDirection{};
     if (totalInternalReflection ||
         reflectance(cosTheta, refractIndex) > utils::randomDouble()) {
-      newDirection = reflect(incomingUnitDirection, hitInfo.normal);
+      newDirection = reflect(incomingUnitDirection, hitInfo.normal());
     } else {
       newDirection =
-          refract(incomingUnitDirection, hitInfo.normal, refractIndex);
+          refract(incomingUnitDirection, hitInfo.normal(), refractIndex);
     }
 
     scattered = Ray{hitInfo.position, newDirection, incoming.time()};
