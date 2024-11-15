@@ -304,19 +304,54 @@ void simpleLight(HittableList& world, Camera& cam) {
   world.add(
       make_shared<Sphere>(Vec3(0, 2, 0), 2, make_shared<Lambertian>(pertext)));
 
-  auto difflight = make_shared<DiffuseLight>(Color(4, 4, 4));
+  auto difflight = make_shared<DiffuseLight>(Color(0.1, 0.2, 2));
+  auto redlight = make_shared<DiffuseLight>(Color(1, 0.2, 0.2));
+  world.add(make_shared<Sphere>(Vec3(0, 7, 0), 2, redlight));
   world.add(make_shared<Quad>(Vec3(3, 1, -2), Vec3(2, 0, 0), Vec3(0, 2, 0),
                               difflight));
 
   cam.mAspectRatio = 16.0 / 9.0;
-  cam.mImageWidth = 400;
-  cam.mSamplesPerPixel = 1000;
+  cam.mImageWidth = 700;
+  cam.mSamplesPerPixel = 300;
   cam.mMaxDepth = 50;
   cam.mBackgroundColor = Color(0, 0, 0);
 
   cam.mVerticalFov = 20;
   cam.mLookFrom = Vec3(26, 3, 6);
   cam.mLookAt = Vec3(0, 2, 0);
+  cam.mUp = Vec3(0, 1, 0);
+
+  cam.mDefocusAngle = 0;
+}
+
+void cornellBox(HittableList& world, Camera& cam) {
+  auto red = make_shared<Lambertian>(Color(.65, .05, .05));
+  auto white = make_shared<Lambertian>(Color(.73, .73, .73));
+  auto green = make_shared<Lambertian>(Color(.12, .45, .15));
+  auto light = make_shared<DiffuseLight>(Color(15, 15, 15));
+
+  world.add(make_shared<Quad>(Vec3(555, 0, 0), Vec3(0, 555, 0), Vec3(0, 0, 555),
+                              green));
+  world.add(
+      make_shared<Quad>(Vec3(0, 0, 0), Vec3(0, 555, 0), Vec3(0, 0, 555), red));
+  world.add(make_shared<Quad>(Vec3(343, 554, 332), Vec3(-130, 0, 0),
+                              Vec3(0, 0, -105), light));
+  world.add(make_shared<Quad>(Vec3(0, 0, 0), Vec3(555, 0, 0), Vec3(0, 0, 555),
+                              white));
+  world.add(make_shared<Quad>(Vec3(555, 555, 555), Vec3(-555, 0, 0),
+                              Vec3(0, 0, -555), white));
+  world.add(make_shared<Quad>(Vec3(0, 0, 555), Vec3(555, 0, 0), Vec3(0, 555, 0),
+                              white));
+
+  cam.mAspectRatio = 1.0;
+  cam.mImageWidth = 600;
+  cam.mSamplesPerPixel = 200;
+  cam.mMaxDepth = 50;
+  cam.mBackgroundColor = Color(0, 0, 0);
+
+  cam.mVerticalFov = 40;
+  cam.mLookFrom = Vec3(278, 278, -800);
+  cam.mLookAt = Vec3(278, 278, 0);
   cam.mUp = Vec3(0, 1, 0);
 
   cam.mDefocusAngle = 0;

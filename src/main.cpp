@@ -8,7 +8,7 @@ int main() {
   HittableList world{};
   Camera cam;
 
-  scene::simpleLight(world, cam);
+  scene::cornellBox(world, cam);
 
   auto t1 = std::chrono::high_resolution_clock::now();
   cam.render(world);
