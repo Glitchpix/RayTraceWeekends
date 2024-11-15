@@ -10,7 +10,9 @@ struct AxisAlignedBoundingBox {
 
   AxisAlignedBoundingBox(const Interval& x, const Interval& y,
                          const Interval& z)
-      : mX{x}, mY{y}, mZ{z} {};
+      : mX{x}, mY{y}, mZ{z} {
+    padToMinimums();
+  };
 
   AxisAlignedBoundingBox(const Vec3& extremaA, const Vec3& extremaB)
       : mX((extremaA[0] <= extremaB[0]) ? Interval{extremaA[0], extremaB[0]}
@@ -18,7 +20,9 @@ struct AxisAlignedBoundingBox {
         mY((extremaA[1] <= extremaB[1]) ? Interval{extremaA[1], extremaB[1]}
                                         : Interval{extremaB[1], extremaA[1]}),
         mZ((extremaA[2] <= extremaB[2]) ? Interval{extremaA[2], extremaB[2]}
-                                        : Interval{extremaB[2], extremaA[2]}){};
+                                        : Interval{extremaB[2], extremaA[2]}) {
+    padToMinimums();
+  };
 
   AxisAlignedBoundingBox(const AxisAlignedBoundingBox& first,
                          const AxisAlignedBoundingBox& second) {
@@ -74,6 +78,20 @@ struct AxisAlignedBoundingBox {
     return mY.size() > mZ.size() ? 1 : 2;
   }
   static const AxisAlignedBoundingBox empty, universe;
+
+private:
+  static constexpr double kMinimumPadding = 0.0001;
+  void padToMinimums() {
+
+    auto constexpr expandFunc = [](Interval& interval) {
+      if (interval.size() < kMinimumPadding) {
+        interval = interval.expand(kMinimumPadding);
+      }
+    };
+    expandFunc(mX);
+    expandFunc(mY);
+    expandFunc(mZ);
+  }
 };
 
 using AABB = AxisAlignedBoundingBox;
