@@ -12,15 +12,15 @@ public:
       : mPosition{position}, mWidthVector{widthVector},
         mHeightVector{heightVector},
         mNormal{cross(mWidthVector, mHeightVector)},
-        mW{mNormal / dot(mNormal, mNormal)},
-        mDistanceFromOrigin{dot(mPosition, mNormal)}, mMaterial{material} {
+        mW{mNormal / dot(mNormal, mNormal)}, mMaterial{material} {
     setBoundingBox();
     mNormal = unitVector(mNormal);
+    mDistanceFromOrigin = {dot(mNormal, mPosition)};
   }
 
   bool hit(const Ray& ray, Interval rayRange,
            HitRecord& hitInfo) const override {
-    const auto rayPlaneAngle = dot(ray.direction(), mNormal);
+    const auto rayPlaneAngle = dot(mNormal, ray.direction());
 
     if (std::fabs(rayPlaneAngle) < kEpsilon) {
       return false;
@@ -76,10 +76,10 @@ private:
   static bool isInterior(double a, double b, HitRecord& hitInfo) {
     const auto unitInterval = Interval(0, 1);
 
-    if (unitInterval.contains(a) && unitInterval.contains(b)) {
-      hitInfo.uv = {a, b};
-      return true;
+    if (!unitInterval.contains(a) || !unitInterval.contains(b)) {
+      return false;
     }
-    return false;
+    hitInfo.uv = {a, b};
+    return true;
   }
 };

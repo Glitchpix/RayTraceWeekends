@@ -14,13 +14,13 @@ struct AxisAlignedBoundingBox {
     padToMinimums();
   };
 
-  AxisAlignedBoundingBox(const Vec3& extremaA, const Vec3& extremaB)
-      : mX((extremaA[0] <= extremaB[0]) ? Interval{extremaA[0], extremaB[0]}
-                                        : Interval{extremaB[0], extremaA[0]}),
-        mY((extremaA[1] <= extremaB[1]) ? Interval{extremaA[1], extremaB[1]}
-                                        : Interval{extremaB[1], extremaA[1]}),
-        mZ((extremaA[2] <= extremaB[2]) ? Interval{extremaA[2], extremaB[2]}
-                                        : Interval{extremaB[2], extremaA[2]}) {
+  AxisAlignedBoundingBox(const Vec3& extremaA, const Vec3& extremaB) {
+    mX = Interval(std::fmin(extremaA[0], extremaB[0]),
+                  std::fmax(extremaA[0], extremaB[0]));
+    mY = Interval(std::fmin(extremaA[1], extremaB[1]),
+                  std::fmax(extremaA[1], extremaB[1]));
+    mZ = Interval(std::fmin(extremaA[2], extremaB[2]),
+                  std::fmax(extremaA[2], extremaB[2]));
     padToMinimums();
   };
 
