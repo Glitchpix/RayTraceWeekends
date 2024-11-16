@@ -8,6 +8,7 @@ public:
   std::array<double, 3> e{};
 
   constexpr Vec3() : e{0, 0, 0} {};
+  constexpr Vec3(double e1) : e{e1, e1, e1} {};
   constexpr Vec3(double e1, double e2, double e3) : e{e1, e2, e3} {};
 
   [[nodiscard]] double x() const { return e[0]; }
