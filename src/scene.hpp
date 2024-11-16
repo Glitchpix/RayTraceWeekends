@@ -10,7 +10,7 @@
 #include "texture.hpp"
 #include "utils.hpp"
 #include <memory>
-
+// NOLINTBEGIN(*magic-numbers)
 namespace scene {
 using std::make_shared;
 using std::shared_ptr;
@@ -371,3 +371,4 @@ void cornellBox(HittableList& world, Camera& cam) {
   cam.mDefocusAngle = 0;
 }
 }; // namespace scene
+// NOLINTEND(*magic-numbers)
