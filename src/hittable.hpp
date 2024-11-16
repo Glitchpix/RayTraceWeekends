@@ -43,3 +43,28 @@ protected:
   Hittable& operator=(const Hittable&) = default;
   Hittable& operator=(Hittable&&) = default;
 };
+
+class Translate : public Hittable {
+public:
+  Translate(std::shared_ptr<Hittable> object, const Vec3& offset)
+      : mObject{object}, mOffset{offset},
+        mBoundingBox(object->boundingBox() + offset) {}
+  bool hit(const Ray& ray, Interval rayRange,
+           HitRecord& hitInfo) const override {
+    Ray offsetRay{ray.origin() - mOffset, ray.direction(), ray.time()};
+
+    if (!mObject->hit(offsetRay, rayRange, hitInfo)) {
+      return false;
+    }
+
+    hitInfo.position += mOffset;
+    return true;
+  }
+
+  [[nodiscard]] AABB boundingBox() const override { return mBoundingBox; }
+
+private:
+  std::shared_ptr<Hittable> mObject;
+  Vec3 mOffset;
+  AABB mBoundingBox;
+};

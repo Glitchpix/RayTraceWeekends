@@ -100,3 +100,9 @@ const AABB AABB::empty =
     AABB{Interval::empty, Interval::empty, Interval::empty};
 const AABB AABB::universe =
     AABB{Interval::universe, Interval::universe, Interval::universe};
+
+AABB operator+(const AABB& box, const Vec3& offset) {
+  return AABB{box.mX + offset.x(), box.mY + offset.y(), box.mZ + offset.z()};
+}
+
+AABB operator+(const Vec3& offset, const AABB& box) { return box + offset; }

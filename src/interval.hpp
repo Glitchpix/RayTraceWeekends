@@ -40,3 +40,11 @@ private:
 constexpr auto Interval::empty = Interval{};
 constexpr auto Interval::universe =
     Interval{-utils::INFINITE_DOUBLE, +utils::INFINITE_DOUBLE};
+
+Interval operator+(const Interval& interval, double displacement) {
+  return {interval.min() + displacement, interval.max() + displacement};
+}
+
+Interval operator+(double displacement, const Interval& interval) {
+  return interval + displacement;
+}
