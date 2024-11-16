@@ -343,6 +343,11 @@ void cornellBox(HittableList& world, Camera& cam) {
   world.add(make_shared<Quad>(Vec3(0, 0, 555), Vec3(555, 0, 0), Vec3(0, 555, 0),
                               white));
 
+  world.add(box(Vec3(130, 0, 65), Vec3(295, 165, 230), white));
+  world.add(box(Vec3(265, 0, 295), Vec3(430, 330, 460), white));
+
+  world = HittableList(make_shared<BVHNode>(world));
+
   cam.mAspectRatio = 1.0;
   cam.mImageWidth = 600;
   cam.mSamplesPerPixel = 200;
