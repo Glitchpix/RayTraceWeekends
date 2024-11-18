@@ -3,6 +3,8 @@
 #include "bvh.hpp"
 #include "camera.hpp"
 #include "color.hpp"
+#include "constant_medium.hpp"
+#include "hittable.hpp"
 #include "hittable_list.hpp"
 #include "material.hpp"
 #include "quad.hpp"
@@ -370,5 +372,52 @@ void cornellBox(HittableList& world, Camera& cam) {
 
   cam.mDefocusAngle = 0;
 }
+
+void cornellSmoke(HittableList& world, Camera& cam) {
+  auto red = make_shared<Lambertian>(Color(.65, .05, .05));
+  auto white = make_shared<Lambertian>(Color(.73, .73, .73));
+  auto green = make_shared<Lambertian>(Color(.12, .45, .15));
+  auto whiteLight = make_shared<DiffuseLight>(Color(7, 7, 7));
+
+  world.add(make_shared<Quad>(Vec3(555, 0, 0), Vec3(0, 555, 0), Vec3(0, 0, 555),
+                              green));
+  world.add(
+      make_shared<Quad>(Vec3(0, 0, 0), Vec3(0, 555, 0), Vec3(0, 0, 555), red));
+  world.add(make_shared<Quad>(Vec3(113, 554, 127), Vec3(330, 0, 0),
+                              Vec3(0, 0, 305), whiteLight));
+  world.add(make_shared<Quad>(Vec3(0, 555, 0), Vec3(555, 0, 0), Vec3(0, 0, 555),
+                              white));
+  world.add(make_shared<Quad>(Vec3(0, 0, 0), Vec3(555, 0, 0), Vec3(0, 0, 555),
+                              white));
+  world.add(make_shared<Quad>(Vec3(0, 0, 555), Vec3(555, 0, 0), Vec3(0, 555, 0),
+                              white));
+
+  shared_ptr<Hittable> box1 = box(Vec3(0, 0, 0), Vec3(165, 330, 165), white);
+  box1 = make_shared<RotateY>(box1, 15);
+  box1 = make_shared<Translate>(box1, Vec3(265, 0, 295));
+
+  shared_ptr<Hittable> box2 = box(Vec3(0, 0, 0), Vec3(165, 165, 165), white);
+  box2 = make_shared<RotateY>(box2, -18);
+  box2 = make_shared<Translate>(box2, Vec3(130, 0, 65));
+
+  world.add(make_shared<ConstantMedium>(0.01, color::Black, box1));
+  world.add(make_shared<ConstantMedium>(0.01, color::White, box2));
+
+  // world.add(make_shared<BVHNode>(world));
+
+  cam.mAspectRatio = 1.0;
+  cam.mImageWidth = 500;
+  cam.mSamplesPerPixel = 300;
+  cam.mMaxDepth = 50;
+  cam.mBackgroundColor = color::Black;
+
+  cam.mVerticalFov = 40;
+  cam.mLookFrom = Vec3(278, 278, -800);
+  cam.mLookAt = Vec3(278, 278, 0);
+  cam.mUp = Vec3(0, 1, 0);
+
+  cam.mDefocusAngle = 0;
+}
+
 }; // namespace scene
 // NOLINTEND(*magic-numbers)
