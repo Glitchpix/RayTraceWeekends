@@ -24,11 +24,15 @@ inline std::pair<double, double> quadraticRealSolve(double a, double b,
   return {negativeNum / denominator, postiveNum / denominator};
 }
 
-template <typename T> inline T scaleToPositiveRange(T value) {
-  return 0.5 * (value + 1.0); // Maps from [-1,1] to [0,1]
+template <typename T>
+inline T scaleToPositiveRange(T value) {
+  constexpr double scaleFactor = 0.5;
+  return scaleFactor * (value + 1.0); // Maps from [-1,1] to [0,1]
 }
-template <typename T> inline T scaleToSymmetricRange(T value) {
-  return value * 2.0 - 1.0; // Maps from [0,1] to [-1,1]
+template <typename T>
+inline T scaleToSymmetricRange(T value) {
+  constexpr double scaleFactor = 2.0;
+  return scaleFactor * value - 1.0; // Maps from [0,1] to [-1,1]
 }
 
 inline double randomDouble() {
@@ -40,6 +44,11 @@ inline double randomDouble() {
 inline double randomDouble(double min, double max) {
   // Returns a random real in [min,max).
   return min + (max - min) * randomDouble();
+}
+
+inline int randomInt(int min, int max) {
+  // Returns a random integer in [min,max].
+  return int(randomDouble(min, max + 1));
 }
 
 } // namespace utils

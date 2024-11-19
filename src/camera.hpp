@@ -23,6 +23,8 @@ public:
   double mDefocusAngle = 0;
   double mFocusDistance = 10;
 
+  Color mBackgroundColor;
+
   void render(const Hittable& world) {
     initialize();
     std::cout << "P3\n" << mImageWidth << ' ' << mImageHeight << "\n255\n";
@@ -101,9 +103,9 @@ private:
 
     const Vec3 rayOrigin = (mDefocusAngle <= 0) ? mCenter : defocusDiskSample();
     const Vec3 rayDirection = pixelCenter - rayOrigin;
-    Ray r{rayOrigin, rayDirection};
+    const double rayTime = utils::randomDouble();
 
-    return r;
+    return {rayOrigin, rayDirection, rayTime};
   }
 
   [[nodiscard]] Vec3 defocusDiskSample() const {
@@ -117,24 +119,26 @@ private:
     return {utils::randomDouble() - 0.5, utils::randomDouble() - 0.5, 0};
   }
 
-  static Color calculateRayColor(const Ray& ray, int depth,
-                                 const Hittable& world) {
+  Color calculateRayColor(const Ray& ray, int depth, const Hittable& world) {
     if (depth <= 0) {
       return color::Black;
     }
     HitRecord hitInfo;
-    if (world.hit(ray, Interval{0.001, utils::INFINITE_DOUBLE}, hitInfo)) {
-      Ray scattered{};
-      Color attenuation{};
-      if (hitInfo.material->scatter(ray, hitInfo, attenuation, scattered)) {
-        return attenuation * calculateRayColor(scattered, depth - 1, world);
-      }
-      return color::Black;
+    if (!world.hit(ray, Interval{0.001, utils::INFINITE_DOUBLE}, hitInfo)) {
+      return mBackgroundColor;
     }
-    Vec3 unitDirection = unitVector(ray.direction());
 
-    auto interpolant = utils::scaleToPositiveRange(unitDirection.y());
-    return (1.0 - interpolant) * color::White +
-           interpolant * Color(0.5, 0.7, 1.0);
+    Ray scattered{};
+    Color attenuation{};
+    Color emissionColor{
+        hitInfo.material->emitted(hitInfo.uv, hitInfo.position)};
+    if (!hitInfo.material->scatter(ray, hitInfo, attenuation, scattered)) {
+      return emissionColor;
+    }
+
+    Color scatterColor =
+        attenuation * calculateRayColor(scattered, depth - 1, world);
+
+    return emissionColor + scatterColor;
   }
 };
