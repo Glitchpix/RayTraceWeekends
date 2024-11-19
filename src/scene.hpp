@@ -11,6 +11,7 @@
 #include "sphere.hpp"
 #include "texture.hpp"
 #include "utils.hpp"
+#include "vec3.hpp"
 #include <memory>
 // NOLINTBEGIN(*magic-numbers)
 namespace scene {
@@ -418,6 +419,80 @@ void cornellSmoke(HittableList& world, Camera& cam) {
 
   cam.mDefocusAngle = 0;
 }
+void secondBookFinalScene(HittableList& world, Camera& cam, int image_width,
+                          int samples_per_pixel, int max_depth) {
+  HittableList boxes1;
+  auto ground = make_shared<Lambertian>(Color(0.48, 0.83, 0.53));
 
+  int boxes_per_side = 20;
+  for (int i = 0; i < boxes_per_side; i++) {
+    for (int j = 0; j < boxes_per_side; j++) {
+      auto w = 100.0;
+      auto x0 = -1000.0 + i * w;
+      auto z0 = -1000.0 + j * w;
+      auto y0 = 0.0;
+      auto x1 = x0 + w;
+      auto y1 = utils::randomDouble(1, 101);
+      auto z1 = z0 + w;
+
+      boxes1.add(box(Vec3(x0, y0, z0), Vec3(x1, y1, z1), ground));
+    }
+  }
+
+  world.add(make_shared<BVHNode>(boxes1));
+
+  auto light = make_shared<DiffuseLight>(Color(7, 7, 7));
+  world.add(make_shared<Quad>(Vec3(123, 554, 147), Vec3(300, 0, 0),
+                              Vec3(0, 0, 265), light));
+
+  auto center1 = Vec3(400, 400, 200);
+  auto center2 = center1 + Vec3(30, 0, 0);
+  auto sphere_material = make_shared<Lambertian>(Color(0.7, 0.3, 0.1));
+  world.add(make_shared<Sphere>(center1, center2, 50, sphere_material));
+
+  world.add(make_shared<Sphere>(Vec3(260, 150, 45), 50,
+                                make_shared<Dielectric>(1.5)));
+  world.add(make_shared<Sphere>(Vec3(0, 150, 145), 50,
+                                make_shared<Metal>(Color(0.8, 0.8, 0.9), 1.0)));
+
+  auto boundary = make_shared<Sphere>(Vec3(360, 150, 145), 70,
+                                      make_shared<Dielectric>(1.5));
+  world.add(boundary);
+  world.add(make_shared<ConstantMedium>(0.2, Color(0.2, 0.4, 0.9), boundary));
+  boundary =
+      make_shared<Sphere>(Vec3(0, 0, 0), 5000, make_shared<Dielectric>(1.5));
+  world.add(make_shared<ConstantMedium>(.0001, Color(1, 1, 1), boundary));
+
+  auto emat =
+      make_shared<Lambertian>(make_shared<ImageTexture>("earthmap.jpg"));
+  world.add(make_shared<Sphere>(Vec3(400, 200, 400), 100, emat));
+  auto pertext = make_shared<NoiseTexture>(0.2);
+  world.add(make_shared<Sphere>(Vec3(220, 280, 300), 80,
+                                make_shared<Lambertian>(pertext)));
+
+  HittableList boxes2;
+  auto white = make_shared<Lambertian>(Color(.73, .73, .73));
+  int ns = 1000;
+  for (int j = 0; j < ns; j++) {
+    boxes2.add(make_shared<Sphere>(Vec3::random(0, 165), 10, white));
+  }
+
+  world.add(make_shared<Translate>(
+      make_shared<RotateY>(make_shared<BVHNode>(boxes2), 15),
+      Vec3(-100, 270, 395)));
+
+  cam.mAspectRatio = 1.0;
+  cam.mImageWidth = image_width;
+  cam.mSamplesPerPixel = samples_per_pixel;
+  cam.mMaxDepth = max_depth;
+  cam.mBackgroundColor = Color(0, 0, 0);
+
+  cam.mVerticalFov = 40;
+  cam.mLookFrom = Vec3(478, 278, -600);
+  cam.mLookAt = Vec3(278, 278, 0);
+  cam.mUp = Vec3(0, 1, 0);
+
+  cam.mDefocusAngle = 0;
+}
 }; // namespace scene
 // NOLINTEND(*magic-numbers)

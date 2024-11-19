@@ -8,7 +8,7 @@ int main() {
   HittableList world{};
   Camera cam;
 
-  scene::cornellSmoke(world, cam);
+  scene::secondBookFinalScene(world, cam, 800, 1000, 50);
 
   auto t1 = std::chrono::high_resolution_clock::now();
   cam.render(world);
